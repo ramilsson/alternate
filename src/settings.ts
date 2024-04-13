@@ -1,6 +1,6 @@
 import type { FastifyServerOptions } from 'fastify';
 
-export const fastifyServerOptions: FastifyServerOptions = {
+export const serverOptions: FastifyServerOptions = {
   disableRequestLogging: true,
   ajv: { customOptions: { coerceTypes: false } },
   logger: {
