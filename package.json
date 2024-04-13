@@ -1,0 +1,19 @@
+{
+  "name": "alternate",
+  "version": "0.1.0",
+  "private": true,
+  "module": "index.ts",
+  "type": "module",
+  "scripts": {
+    "start": "bun --watch src/index.ts"
+  },
+  "dependencies": {
+    "fastify": "^4.26.2"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "^20.12.7",
+    "pino-pretty": "^11.0.0",
+    "typescript": "^5.4.5"
+  }
+}
