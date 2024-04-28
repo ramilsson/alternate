@@ -1,10 +1,10 @@
 import Fastify, { type FastifyServerOptions } from 'fastify';
-import prisma from './prisma';
+import database from './database';
 
 export const buildServer = (options?: FastifyServerOptions) => {
   const fastifyServer = Fastify(options);
 
-  fastifyServer.register(prisma);
+  fastifyServer.register(database);
 
   return fastifyServer;
 };
