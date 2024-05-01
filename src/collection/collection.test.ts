@@ -67,7 +67,7 @@ describe('Collection fetching', () => {
 describe('Collection creation', () => {
   test.todo('Cannot create collection with invalid payload');
 
-  test('Cannot create collection with the same name', async ({
+  test('Cannot create collection with the same name in one project', async ({
     server,
     oneProject,
   }) => {
@@ -106,5 +106,30 @@ describe('Collection creation', () => {
       name: COLLECTION_NAME,
       projectId: oneProject.id,
     });
+  });
+
+  test('Can create collections with the same name in different projects', async ({
+    server,
+    manyProjects,
+  }) => {
+    const response = await server.inject({
+      url: '/collection',
+      method: 'POST',
+      payload: { name: COLLECTION_NAME, projectId: manyProjects[0].id },
+    });
+    const response2 = await server.inject({
+      url: '/collection',
+      method: 'POST',
+      payload: { name: COLLECTION_NAME, projectId: manyProjects[1].id },
+    });
+
+    const firstCollection = JSON.parse(response.body);
+    const secondCollection = JSON.parse(response2.body);
+    const collectionsCount = await server.database.collection.count();
+
+    expect(collectionsCount).toBe(2);
+    expect(response.statusCode).toBe(201);
+    expect(response2.statusCode).toBe(201);
+    expect(firstCollection.name).toEqual(secondCollection.name);
   });
 });
