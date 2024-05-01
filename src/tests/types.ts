@@ -1,5 +1,5 @@
 import type { FastifyInstance } from 'fastify';
-import type { Collection, Project } from '@prisma/client';
+import type { Collection, Project, Resource } from '@prisma/client';
 
 export interface Fixtures {
   server: FastifyInstance;
@@ -9,4 +9,7 @@ export interface Fixtures {
 
   oneCollection: Collection;
   manyCollections: Collection[];
+
+  oneResource: Resource;
+  manyResources: Resource[];
 }

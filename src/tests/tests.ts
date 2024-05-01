@@ -64,4 +64,36 @@ export const test = testBase.extend<Fixtures>({
 
     await server.database.collection.deleteMany();
   },
+
+  oneResource: async ({ server, oneCollection }, use) => {
+    const resource = await server.database.resource.create({
+      data: {
+        collectionId: oneCollection.id,
+        fields: [{ type: 'literal', value: `some value` }],
+      },
+    });
+
+    await use(resource);
+
+    await server.database.resource.deleteMany();
+  },
+
+  manyResources: async ({ server, oneCollection }, use) => {
+    const resourcesData = Array(10)
+      .fill(null)
+      .map((item, index) => ({
+        collectionId: oneCollection.id,
+        fields: [{ type: 'literal', value: `some value ${index}` } as const],
+      }));
+
+    await server.database.resource.createMany({
+      data: resourcesData,
+    });
+
+    const resources = await server.database.resource.findMany();
+
+    await use(resources);
+
+    await server.database.resource.deleteMany();
+  },
 });

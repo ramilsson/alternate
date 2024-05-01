@@ -4,4 +4,5 @@ import { server } from './global-setup';
 afterEach(async () => {
   await server.database.project.deleteMany();
   await server.database.collection.deleteMany();
+  await server.database.resource.deleteMany();
 });
