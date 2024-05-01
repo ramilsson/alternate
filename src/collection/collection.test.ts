@@ -3,8 +3,8 @@ import { test } from '../tests';
 
 const COLLECTION_NAME = 'test-collection-name';
 
-describe('Collection fetching', () => {
-  test('Cannot fetch list of collections without projectId', async ({
+describe('Collection reading', () => {
+  test('Cannot read list of collections without projectId', async ({
     server,
   }) => {
     const response = await server.inject({
@@ -15,30 +15,40 @@ describe('Collection fetching', () => {
     expect(response.statusCode).toBe(400);
   });
 
-  test('Can fetch list of collections of single project only', async ({
+  test('Can read list of collections of single project only', async ({
     server,
     manyCollections,
   }) => {
-    const projectWithNoCollections = await server.database.project.create({
-      data: { name: 'Project with no collections' },
+    const projectWithCollections = await server.database.project.create({
+      data: {
+        name: 'Project with collections',
+        collections: {
+          createMany: {
+            data: [{ name: 'Collection 11' }, { name: 'Collection 22' }],
+          },
+        },
+      },
+      include: { collections: true },
     });
 
     const response = await server.inject({
       url: '/collection',
       method: 'GET',
-      query: { projectId: projectWithNoCollections.id },
+      query: { projectId: projectWithCollections.id },
     });
 
     const parsedBody = JSON.parse(response.body);
-    const collectionsCount = await server.database.collection.count();
+    const totalCollectionsCount = await server.database.collection.count();
 
-    // Ensure that there are some collections in database...
-    expect(collectionsCount).toBeGreaterThan(0);
-    // ...but expect to not have these collections in response
-    expect(parsedBody).toEqual([]);
+    // Ensure that there are more collections in database...
+    expect(totalCollectionsCount).toBeGreaterThan(
+      projectWithCollections.collections.length
+    );
+    // ...but we get only the collections of given one project in response
+    expect(parsedBody).toEqual(projectWithCollections.collections);
   });
 
-  test('Can fetch list of collections of project', async ({ server }) => {
+  test('Can read list of collections of project', async ({ server }) => {
     const projectWithCollections = await server.database.project.create({
       data: {
         name: 'Project with collections',
