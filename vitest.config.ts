@@ -4,5 +4,13 @@ export default defineConfig({
   test: {
     setupFiles: ['src/tests/setup.ts'],
     globalSetup: ['src/tests/global-setup.ts'],
+    passWithNoTests: true,
+
+    /**
+     * Limit number of workers to ensure that asynchronous fixtures initialize sequentially.
+     * @TODO Create issue on vitest?
+     */
+    minWorkers: 1,
+    maxWorkers: 1,
   },
 });
