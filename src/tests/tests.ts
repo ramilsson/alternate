@@ -35,4 +35,33 @@ export const test = testBase.extend<Fixtures>({
 
     await server.database.project.deleteMany();
   },
+
+  oneCollection: async ({ server, oneProject }, use) => {
+    const collection = await server.database.collection.create({
+      data: { name: 'Test collection', projectId: oneProject.id },
+    });
+
+    await use(collection);
+
+    await server.database.collection.deleteMany();
+  },
+
+  manyCollections: async ({ server, oneProject }, use) => {
+    const collectionsData = Array(10)
+      .fill(null)
+      .map((item, index) => ({
+        name: `Collection ${index}`,
+        projectId: oneProject.id,
+      }));
+
+    await server.database.collection.createMany({
+      data: collectionsData,
+    });
+
+    const collections = await server.database.collection.findMany();
+
+    await use(collections);
+
+    await server.database.collection.deleteMany();
+  },
 });
