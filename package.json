@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "bun --watch src/index.ts",
-    "test": "bun --env-file=.env.test vitest"
+    "test": "bun --env-file=.env.test vitest",
+    "prisma:generate": "prisma generate"
   },
   "dependencies": {
     "@prisma/client": "5.12.1",
