@@ -8,7 +8,7 @@
     "start": "bun --watch src/index.ts",
     "test": "bun --env-file=.env.test vitest",
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev"
+    "prisma:migrate": "prisma migrate dev --skip-generate"
   },
   "dependencies": {
     "@prisma/client": "5.12.1",
