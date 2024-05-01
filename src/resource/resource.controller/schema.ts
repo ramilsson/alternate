@@ -3,6 +3,7 @@ import { Type as T } from '@sinclair/typebox';
 const fieldSchema = T.Object(
   {
     type: T.Union([T.Literal('literal')]),
+    key: T.String({ minLength: 1 }),
     value: T.Unknown(),
   },
   { additionalProperties: false }

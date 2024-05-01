@@ -6,10 +6,12 @@ describe('Resource creation', () => {
     const invalidVariantsOfFields: any[] = [
       undefined,
       [{}],
-      [{ invalidProperty: 'value' }],
+      [{ invalidKey: 'value' }],
       [{ type: '' }],
       [{ type: 'another invalid type value' }],
       [{ type: 'literal' }],
+      [{ type: 'literal', value: '' }],
+      [{ type: 'literal', value: '', key: '' }],
     ];
 
     for (const [index, fields] of invalidVariantsOfFields.entries()) {
@@ -39,15 +41,15 @@ describe('Resource creation', () => {
       // empty fields
       [],
       // fields with one item
-      [{ type: 'literal', value: '' }],
+      [{ type: 'literal', key: 'key', value: 'value' }],
       // fields with multiple items and different type of values
       [
-        { type: 'literal', value: 'string' },
-        { type: 'literal', value: 0 },
-        { type: 'literal', value: {} },
-        { type: 'literal', value: [] },
-        { type: 'literal', value: null },
-        { type: 'literal', value: true },
+        { type: 'literal', key: 'string field', value: 'this is string' },
+        { type: 'literal', key: 'number field', value: 0 },
+        { type: 'literal', key: 'object field', value: {} },
+        { type: 'literal', key: 'array field', value: [] },
+        { type: 'literal', key: 'null field', value: null },
+        { type: 'literal', key: 'boolean field', value: true },
       ],
     ];
 
@@ -103,10 +105,10 @@ describe('Resource creation', () => {
           resources: {
             createMany: {
               data: [
-                { fields: [{ type: 'literal', value: 0 }] },
-                { fields: [{ type: 'literal', value: 1 }] },
-                { fields: [{ type: 'literal', value: 2 }] },
-                { fields: [{ type: 'literal', value: 3 }] },
+                { fields: [{ type: 'literal', key: 'key1', value: 0 }] },
+                { fields: [{ type: 'literal', key: 'key2', value: 1 }] },
+                { fields: [{ type: 'literal', key: 'key3', value: 2 }] },
+                { fields: [{ type: 'literal', key: 'key4', value: 3 }] },
               ],
             },
           },

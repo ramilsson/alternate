@@ -69,7 +69,7 @@ export const test = testBase.extend<Fixtures>({
     const resource = await server.database.resource.create({
       data: {
         collectionId: oneCollection.id,
-        fields: [{ type: 'literal', value: `some value` }],
+        fields: [{ type: 'literal', key: 'some key', value: `some value` }],
       },
     });
 
@@ -83,7 +83,13 @@ export const test = testBase.extend<Fixtures>({
       .fill(null)
       .map((item, index) => ({
         collectionId: oneCollection.id,
-        fields: [{ type: 'literal', value: `some value ${index}` } as const],
+        fields: [
+          {
+            type: 'literal',
+            key: 'some key',
+            value: `some value ${index}`,
+          } as const,
+        ],
       }));
 
     await server.database.resource.createMany({
