@@ -11,6 +11,7 @@
     "prisma:migrate": "prisma migrate dev --skip-generate"
   },
   "dependencies": {
+    "@fastify/cors": "^9.0.1",
     "@prisma/client": "5.12.1",
     "fastify": "^4.26.2",
     "fastify-plugin": "^4.5.1",
