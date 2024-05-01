@@ -4,7 +4,7 @@ import { test } from '../tests';
 const PROJECT_NAME = 'test-project-name';
 
 describe('Project fetching', () => {
-  test('Fetch list of projects', async ({ server, projects }) => {
+  test('Fetch list of projects', async ({ server, manyProjects }) => {
     const response = await server.inject({
       url: '/project',
       method: 'GET',
@@ -13,7 +13,7 @@ describe('Project fetching', () => {
     const { body } = response;
     const parsedBody = JSON.parse(body);
 
-    expect(parsedBody).toEqual(projects);
+    expect(parsedBody).toEqual(manyProjects);
   });
 });
 

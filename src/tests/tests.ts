@@ -8,7 +8,17 @@ export const test = testBase.extend<Fixtures>({
     await use(server);
   },
 
-  projects: async ({ server }, use) => {
+  oneProject: async ({ server }, use) => {
+    const project = await server.database.project.create({
+      data: { name: 'Test project' },
+    });
+
+    await use(project);
+
+    await server.database.project.deleteMany();
+  },
+
+  manyProjects: async ({ server }, use) => {
     const projectsData = Array(10)
       .fill(null)
       .map((item, index) => ({
@@ -22,5 +32,7 @@ export const test = testBase.extend<Fixtures>({
     const projects = await server.database.project.findMany();
 
     await use(projects);
+
+    await server.database.project.deleteMany();
   },
 });

@@ -3,5 +3,7 @@ import type { Project } from '@prisma/client';
 
 export interface Fixtures {
   server: FastifyInstance;
-  projects: Project[];
+
+  oneProject: Project;
+  manyProjects: Project[];
 }
