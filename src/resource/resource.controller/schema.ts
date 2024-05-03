@@ -21,3 +21,15 @@ export const resourceCreateSchema = {
     fields: T.Array(fieldSchema),
   }),
 };
+
+export const resourceUpdateSchema = {
+  params: T.Object({
+    id: T.String({ minLength: 1 }),
+  }),
+  body: T.Object(
+    {
+      fields: T.Array(fieldSchema),
+    },
+    { additionalProperties: false }
+  ),
+};

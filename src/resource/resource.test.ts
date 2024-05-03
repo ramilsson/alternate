@@ -136,3 +136,53 @@ describe('Resource creation', () => {
     });
   });
 });
+
+describe('Resource updating', () => {
+  test('Can update fields of resource', async ({
+    server,
+    oneResource: resourceToUpdate,
+  }) => {
+    const newFields: typeof resourceToUpdate.fields = [
+      { type: 'literal', key: 'some key', value: 'value of some key' },
+      { type: 'literal', key: 'other key', value: 'value of other key' },
+    ];
+
+    const response = await server.inject({
+      url: `/resource/${resourceToUpdate.id}`,
+      method: 'PATCH',
+      payload: { fields: newFields },
+    });
+
+    const updatedResource = JSON.parse(response.body);
+
+    expect(response.statusCode).toBe(200);
+    expect(updatedResource).toEqual({
+      id: resourceToUpdate.id,
+      collectionId: resourceToUpdate.collectionId,
+      fields: newFields,
+    });
+  });
+
+  test('Cannot move resource to other collection by changing collectionId', async ({
+    server,
+    oneProject,
+    oneResource: resourceToUpdate,
+  }) => {
+    const oldCollectionId = resourceToUpdate.collectionId;
+
+    const { id: newCollectionId } = await server.database.collection.create({
+      data: { name: 'new collection', projectId: oneProject.id },
+    });
+
+    const response = await server.inject({
+      url: `/resource/${resourceToUpdate.id}`,
+      method: 'PATCH',
+      payload: { fields: [], collectionId: newCollectionId },
+    });
+
+    const updatedResource = JSON.parse(response.body);
+
+    expect(response.statusCode).toBe(200);
+    expect(updatedResource.collectionId).toEqual(oldCollectionId);
+  });
+});
