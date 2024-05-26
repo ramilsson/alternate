@@ -1,9 +1,6 @@
 import { promisify } from 'node:util';
 import { exec } from 'node:child_process';
 import { PostgreSqlContainer } from '@testcontainers/postgresql';
-import { buildServer } from '../build-server';
-
-export const server = buildServer();
 
 async function runMigrations() {
   const command = `prisma db push --skip-generate`;
@@ -31,18 +28,8 @@ export default async function setup() {
 
   await runMigrations();
 
-  console.log('Build server...');
-
-  await server.ready();
-
-  console.log('Server is ready');
-
   return async function teardown() {
     console.log('Teardown...');
-
-    await server.close();
-
-    console.log('Server closed');
 
     await container.stop();
 

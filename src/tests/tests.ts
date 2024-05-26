@@ -1,10 +1,24 @@
-import { test as testBase } from 'vitest';
-import { server } from './global-setup';
+/**
+ * @file Beware that this file could run multiple times (once per test file),
+ * because vitest runs each test file in isolation by default.
+ * @see https://vitest.dev/config/#setupfiles
+ * @see https://vitest.dev/guide/improving-performance
+ */
 
+import { test as testBase } from 'vitest';
+import type { FastifyInstance } from 'fastify';
+import { buildServer } from '../build-server';
 import type { Fixtures } from './types';
+
+export let server: FastifyInstance | null = null;
 
 export const test = testBase.extend<Fixtures>({
   server: async ({}, use) => {
+    if (!server) {
+      server = buildServer();
+      await server.ready();
+    }
+
     await use(server);
   },
 
