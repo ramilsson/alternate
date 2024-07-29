@@ -3,28 +3,30 @@
   "version": "0.1.0",
   "private": true,
   "module": "index.ts",
-  "type": "module",
   "scripts": {
-    "start": "bun --watch src/index.ts",
-    "test": "bun --env-file=.env.test vitest",
+    "dev": "npx tsx watch src/index.ts",
+    "start": "node build/index.js",
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev --skip-generate"
   },
   "dependencies": {
     "@fastify/cors": "^9.0.1",
     "@prisma/client": "5.12.1",
+    "@sinclair/typebox": "^0.32.35",
     "fastify": "^4.26.2",
     "fastify-plugin": "^4.5.1",
     "prisma-json-types-generator": "^3.0.4"
   },
   "devDependencies": {
     "@testcontainers/postgresql": "^10.8.2",
-    "@types/bun": "latest",
+    "@tsconfig/node20": "^20.1.4",
     "@types/node": "^20.12.7",
     "pino-pretty": "^11.0.0",
     "prisma": "^5.12.1",
     "typescript": "^5.4.5",
-    "vitest": "^1.5.0"
+    "vitest": "^2.0.4"
   },
   "engines": {
     "node": "20.x"
