@@ -25,5 +25,8 @@
     "prisma": "^5.12.1",
     "typescript": "^5.4.5",
     "vitest": "^1.5.0"
+  },
+  "engines": {
+    "node": "20.x"
   }
 }
