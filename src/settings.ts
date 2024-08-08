@@ -1,7 +1,7 @@
 import type { FastifyServerOptions } from 'fastify';
 
 export const serverOptions: FastifyServerOptions = {
-  disableRequestLogging: true,
+  disableRequestLogging: process.env.NODE_ENV !== 'development',
   ajv: { customOptions: { coerceTypes: false } },
   logger: {
     transport:
