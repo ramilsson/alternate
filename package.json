@@ -7,7 +7,7 @@
     "dev": "npx tsx watch src/index.ts",
     "start": "node build/index.js",
     "build": "tsc -p tsconfig.json",
-    "test": "vitest",
+    "test": "dotenv -e .env.test -- vitest",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev --skip-generate"
   },
@@ -23,6 +23,7 @@
     "@testcontainers/postgresql": "^10.8.2",
     "@tsconfig/node20": "^20.1.4",
     "@types/node": "^20.12.7",
+    "dotenv-cli": "^7.4.2",
     "pino-pretty": "^11.0.0",
     "prisma": "^5.12.1",
     "typescript": "^5.4.5",
