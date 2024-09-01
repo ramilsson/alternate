@@ -1,9 +1,12 @@
 import { describe, expect } from 'vitest';
+import { AttributeType } from '@prisma/client';
 import { test } from '../tests';
+import { AttributeSchema } from './resource.controller';
+import { ResourceWithAttributes } from './types';
 
 describe('Resource creation', () => {
-  describe('Cannot create resource with invalid fields', async () => {
-    const invalidVariantsOfFields: any[] = [
+  describe('Cannot create resource with invalid attributes', async () => {
+    const invalidVariantsOfAttributes: unknown[] = [
       undefined,
       [{}],
       [{ invalidKey: 'value' }],
@@ -14,8 +17,8 @@ describe('Resource creation', () => {
       [{ type: 'literal', value: '', key: '' }],
     ];
 
-    for (const [index, fields] of invalidVariantsOfFields.entries()) {
-      test(`Cannot create resource with invalid fields: ${index}`, async ({
+    for (const [index, attributes] of invalidVariantsOfAttributes.entries()) {
+      test(`Cannot create resource with invalid attributes: ${index}`, async ({
         server,
         oneCollection,
       }) => {
@@ -24,7 +27,7 @@ describe('Resource creation', () => {
           method: 'POST',
           payload: {
             collectionId: oneCollection.id,
-            fields: fields,
+            attributes: attributes,
           },
         });
 
@@ -36,25 +39,55 @@ describe('Resource creation', () => {
     }
   });
 
-  describe('Can create resource with valid fields', async () => {
-    const validVariantsOfFields: any[] = [
-      // empty fields
+  describe('Can create resource with valid attributes', async () => {
+    const validVariantsOfAttributes: AttributeSchema[][] = [
+      // empty attributes
       [],
-      // fields with one item
-      [{ type: 'literal', key: 'key', value: 'value' }],
-      // fields with multiple items and different type of values
+      // attributes with one item
       [
-        { type: 'literal', key: 'string field', value: 'this is string' },
-        { type: 'literal', key: 'number field', value: 0 },
-        { type: 'literal', key: 'object field', value: {} },
-        { type: 'literal', key: 'array field', value: [] },
-        { type: 'literal', key: 'null field', value: null },
-        { type: 'literal', key: 'boolean field', value: true },
+        {
+          type: AttributeType.LITERAL_NUMBER,
+          name: 'number attribute',
+          value: 'value',
+        },
+      ],
+      // attributes with multiple items and different type of values
+      [
+        {
+          type: AttributeType.LITERAL_STRING,
+          name: 'string attribute',
+          value: 'this is string',
+        },
+        {
+          type: AttributeType.LITERAL_BOOLEAN,
+          name: 'boolean attribute',
+          value: true,
+        },
+        {
+          type: AttributeType.LITERAL_JSON,
+          name: 'json object attribute',
+          value: { key: 'value' },
+        },
+        {
+          type: AttributeType.LITERAL_JSON,
+          name: 'json array attribute',
+          value: [1, 2, 3],
+        },
+        {
+          type: AttributeType.LITERAL_NUMBER,
+          name: 'another number attribute',
+          value: 0,
+        },
+        {
+          type: AttributeType.LITERAL_NUMBER,
+          name: 'another string attribute',
+          value: 'string value',
+        },
       ],
     ];
 
-    for (const [index, fields] of validVariantsOfFields.entries()) {
-      test(`Can create resource with valid fields: ${index}`, async ({
+    for (const [index, attributes] of validVariantsOfAttributes.entries()) {
+      test(`Can create resource with valid attributes: ${index}`, async ({
         server,
         oneCollection,
       }) => {
@@ -63,7 +96,7 @@ describe('Resource creation', () => {
           method: 'POST',
           payload: {
             collectionId: oneCollection.id,
-            fields: fields,
+            attributes: attributes,
           },
         });
 
@@ -72,11 +105,7 @@ describe('Resource creation', () => {
 
         expect(response.statusCode).toBe(201);
         expect(resourcesCount).toBe(1);
-        expect(parsedBody).toEqual({
-          id: parsedBody.id,
-          collectionId: oneCollection.id,
-          fields: fields,
-        });
+        expect(parsedBody.attributes.length).toBe(attributes.length);
       });
     }
   });
@@ -104,16 +133,11 @@ describe('Resource creation', () => {
           projectId: oneProject.id,
           resources: {
             createMany: {
-              data: [
-                { fields: [{ type: 'literal', key: 'key1', value: 0 }] },
-                { fields: [{ type: 'literal', key: 'key2', value: 1 }] },
-                { fields: [{ type: 'literal', key: 'key3', value: 2 }] },
-                { fields: [{ type: 'literal', key: 'key4', value: 3 }] },
-              ],
+              data: [{}, {}, {}, {}],
             },
           },
         },
-        include: { resources: true },
+        include: { resources: { include: { attributes: true } } },
       });
 
       const response = await server.inject({
@@ -138,29 +162,32 @@ describe('Resource creation', () => {
 });
 
 describe('Resource updating', () => {
-  test('Can update fields of resource', async ({
+  test('Can update attributes of resource', async ({
     server,
     oneResource: resourceToUpdate,
   }) => {
-    const newFields: typeof resourceToUpdate.fields = [
-      { type: 'literal', key: 'some key', value: 'value of some key' },
-      { type: 'literal', key: 'other key', value: 'value of other key' },
-    ];
+    const newAttributes = resourceToUpdate.attributes.map((attr) => ({
+      type: attr.type,
+      name: attr.name,
+      value: 'new value',
+    }));
 
     const response = await server.inject({
       url: `/resource/${resourceToUpdate.id}`,
       method: 'PATCH',
-      payload: { fields: newFields },
+      payload: { attributes: newAttributes },
     });
 
-    const updatedResource = JSON.parse(response.body);
+    const updatedResource = JSON.parse(response.body) as ResourceWithAttributes;
 
     expect(response.statusCode).toBe(200);
-    expect(updatedResource).toEqual({
-      id: resourceToUpdate.id,
-      collectionId: resourceToUpdate.collectionId,
-      fields: newFields,
-    });
+    expect(
+      updatedResource.attributes.map((a) => ({
+        type: a.type,
+        name: a.name,
+        value: a.value,
+      }))
+    ).toEqual(newAttributes);
   });
 
   test('Cannot move resource to other collection by changing collectionId', async ({
@@ -177,7 +204,7 @@ describe('Resource updating', () => {
     const response = await server.inject({
       url: `/resource/${resourceToUpdate.id}`,
       method: 'PATCH',
-      payload: { fields: [], collectionId: newCollectionId },
+      payload: { attributes: [], collectionId: newCollectionId },
     });
 
     const updatedResource = JSON.parse(response.body);

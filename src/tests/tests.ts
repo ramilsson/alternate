@@ -9,6 +9,7 @@ import { test as testBase } from 'vitest';
 import type { FastifyInstance } from 'fastify';
 import { buildServer } from '../build-server';
 import type { Fixtures } from './types';
+import { AttributeType } from '@prisma/client';
 
 export let server: FastifyInstance | null = null;
 
@@ -83,8 +84,34 @@ export const test = testBase.extend<Fixtures>({
     const resource = await server.database.resource.create({
       data: {
         collectionId: oneCollection.id,
-        fields: [{ type: 'literal', key: 'some key', value: `some value` }],
+        attributes: {
+          createMany: {
+            data: [
+              {
+                type: AttributeType.LITERAL_STRING,
+                name: 'attributeName1',
+                value: 'attributeValue1',
+              },
+              {
+                type: AttributeType.LITERAL_NUMBER,
+                name: 'attributeName2',
+                value: '1',
+              },
+              {
+                type: AttributeType.LITERAL_BOOLEAN,
+                name: 'attributeName3',
+                value: 'true',
+              },
+              {
+                type: AttributeType.LITERAL_JSON,
+                name: 'attributeName4',
+                value: JSON.stringify({}),
+              },
+            ],
+          },
+        },
       },
+      include: { attributes: true },
     });
 
     await use(resource);
@@ -93,21 +120,12 @@ export const test = testBase.extend<Fixtures>({
   },
 
   manyResources: async ({ server, oneCollection }, use) => {
-    const resourcesData = Array(10)
-      .fill(null)
-      .map((item, index) => ({
-        collectionId: oneCollection.id,
-        fields: [
-          {
-            type: 'literal',
-            key: 'some key',
-            value: `some value ${index}`,
-          } as const,
-        ],
-      }));
+    const NUMBER_OF_RESOURCES_TO_CREATE = 10;
 
     await server.database.resource.createMany({
-      data: resourcesData,
+      data: Array(NUMBER_OF_RESOURCES_TO_CREATE).fill({
+        collectionId: oneCollection.id,
+      }),
     });
 
     const resources = await server.database.resource.findMany();

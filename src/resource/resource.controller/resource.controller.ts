@@ -19,6 +19,7 @@ export const resourceController: FastifyPluginAsync = async (fastify) => {
     handler: async (request) => {
       return await fastify.database.resource.findMany({
         where: { collectionId: request.query.collectionId },
+        include: { attributes: true },
       });
     },
   });
@@ -31,8 +32,16 @@ export const resourceController: FastifyPluginAsync = async (fastify) => {
       const createdResource = await fastify.database.resource.create({
         data: {
           collectionId: request.body.collectionId,
-          fields: request.body.fields,
+          attributes: {
+            createMany: {
+              data: request.body.attributes.map((attr) => ({
+                ...attr,
+                value: String(attr.value),
+              })),
+            },
+          },
         },
+        include: { attributes: true },
       });
 
       return reply.code(201).send(createdResource);
@@ -46,7 +55,19 @@ export const resourceController: FastifyPluginAsync = async (fastify) => {
     handler: async (request, reply) => {
       const updatedResource = await fastify.database.resource.update({
         where: { id: request.params.id },
-        data: { fields: request.body.fields },
+        data: {
+          attributes: {
+            updateMany: request.body.attributes.map((attr) => ({
+              where: { name: attr.name },
+              data: {
+                type: attr.type,
+                name: attr.name,
+                value: String(attr.value),
+              },
+            })),
+          },
+        },
+        include: { attributes: true },
       });
 
       return reply.code(200).send(updatedResource);

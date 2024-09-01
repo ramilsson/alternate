@@ -1,9 +1,14 @@
 import { Type as T } from '@sinclair/typebox';
 
-const fieldSchema = T.Object(
+export const attributeSchema = T.Object(
   {
-    type: T.Union([T.Literal('literal')]),
-    key: T.String({ minLength: 1 }),
+    type: T.Union([
+      T.Literal('LITERAL_NUMBER'),
+      T.Literal('LITERAL_STRING'),
+      T.Literal('LITERAL_BOOLEAN'),
+      T.Literal('LITERAL_JSON'),
+    ]),
+    name: T.String({ minLength: 1 }),
     value: T.Unknown(),
   },
   { additionalProperties: false }
@@ -18,7 +23,7 @@ export const resourceListReadSchema = {
 export const resourceCreateSchema = {
   body: T.Object({
     collectionId: T.String({ minLength: 1 }),
-    fields: T.Array(fieldSchema),
+    attributes: T.Array(attributeSchema),
   }),
 };
 
@@ -28,7 +33,7 @@ export const resourceUpdateSchema = {
   }),
   body: T.Object(
     {
-      fields: T.Array(fieldSchema),
+      attributes: T.Array(attributeSchema),
     },
     { additionalProperties: false }
   ),
