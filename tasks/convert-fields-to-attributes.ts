@@ -1,5 +1,11 @@
 #!/usr/bin/env -S npx tsx
 
+// @ts-nocheck ("Resource" model doesnt have "fields" anymore)
+
+/**
+ * @file This file contains an one-off task that converts data of resource `fields` to `attributes`.
+ */
+
 import { PrismaClient, Prisma, AttributeType } from '@prisma/client';
 
 const prisma = new PrismaClient();

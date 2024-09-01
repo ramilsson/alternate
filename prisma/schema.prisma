@@ -37,8 +37,6 @@ model Resource {
   id           String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   collection   Collection  @relation(fields: [collectionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   collectionId String      @db.Uuid
-  /// [Field]
-  fields       Json[]
   attributes   Attribute[]
 }
 
