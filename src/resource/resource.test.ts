@@ -97,6 +97,7 @@ describe('Resource creation', () => {
           payload: {
             collectionId: oneCollection.id,
             attributes: attributes,
+            payload: {},
           },
         });
 
@@ -133,7 +134,12 @@ describe('Resource creation', () => {
           projectId: oneProject.id,
           resources: {
             createMany: {
-              data: [{}, {}, {}, {}],
+              data: [
+                { payload: {} },
+                { payload: {} },
+                { payload: {} },
+                { payload: {} },
+              ],
             },
           },
         },
@@ -158,6 +164,21 @@ describe('Resource creation', () => {
       // ...but we get only the resources of given one collection in response
       expect(parsedBody).toEqual(collectionWithResources.resources);
     });
+
+    test('Resource have payload property', async ({ server, oneResource }) => {
+      const response = await server.inject({
+        url: `/resource`,
+        method: 'GET',
+        query: {
+          collectionId: oneResource.collectionId,
+        },
+      });
+
+      const parsedBody = JSON.parse(response.body);
+      const resource = parsedBody.at(0);
+
+      expect(resource).toHaveProperty('payload');
+    });
   });
 });
 
@@ -175,7 +196,7 @@ describe('Resource updating', () => {
     const response = await server.inject({
       url: `/resource/${resourceToUpdate.id}`,
       method: 'PATCH',
-      payload: { attributes: newAttributes },
+      payload: { attributes: newAttributes, payload: {} },
     });
 
     const updatedResource = JSON.parse(response.body) as ResourceWithAttributes;
@@ -204,7 +225,7 @@ describe('Resource updating', () => {
     const response = await server.inject({
       url: `/resource/${resourceToUpdate.id}`,
       method: 'PATCH',
-      payload: { attributes: [], collectionId: newCollectionId },
+      payload: { attributes: [], payload: {}, collectionId: newCollectionId },
     });
 
     const updatedResource = JSON.parse(response.body);
@@ -212,4 +233,54 @@ describe('Resource updating', () => {
     expect(response.statusCode).toBe(200);
     expect(updatedResource.collectionId).toEqual(oldCollectionId);
   });
+});
+
+describe('Cannot create or update resource with invalid payload', async () => {
+  const INVALID_VARIANTS_OF_PAYLOAD: unknown[] = [
+    undefined, // undefined
+    null, // null
+    'string', // string
+    0, // number
+    Array[0], // array
+    true, // boolean
+  ];
+
+  for (const [index, payload] of INVALID_VARIANTS_OF_PAYLOAD.entries()) {
+    test(`Cannot create resource with invalid payload: ${index}`, async ({
+      server,
+      oneCollection,
+    }) => {
+      const response = await server.inject({
+        url: '/resource',
+        method: 'POST',
+        payload: {
+          collectionId: oneCollection.id,
+          attributes: [],
+          payload: payload,
+        },
+      });
+
+      const resourcesCount = await server.database.resource.count();
+
+      expect(response.statusCode).toBe(400);
+      expect(resourcesCount).toBe(0);
+    });
+  }
+
+  for (const [index, payload] of INVALID_VARIANTS_OF_PAYLOAD.entries()) {
+    test(`Cannot update resource with invalid payload: ${index}`, async ({
+      server,
+      oneResource,
+    }) => {
+      const response = await server.inject({
+        url: `/resource/${oneResource.id}`,
+        method: 'PATCH',
+        payload: {
+          payload: payload,
+        },
+      });
+
+      expect(response.statusCode).toBe(400);
+    });
+  }
 });

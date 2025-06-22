@@ -1,5 +1,7 @@
 declare global {
-  namespace PrismaJson {}
+  namespace PrismaJson {
+    type ResourcePayload = Record<string, unknown>;
+  }
 }
 
 export {};

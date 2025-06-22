@@ -38,6 +38,8 @@ model Resource {
   collection   Collection  @relation(fields: [collectionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   collectionId String      @db.Uuid
   attributes   Attribute[]
+  /// [ResourcePayload]
+  payload      Json        @default("{}")
 }
 
 model Attribute {

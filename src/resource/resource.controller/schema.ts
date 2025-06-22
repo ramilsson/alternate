@@ -24,6 +24,7 @@ export const resourceCreateSchema = {
   body: T.Object({
     collectionId: T.String({ minLength: 1 }),
     attributes: T.Array(attributeSchema),
+    payload: T.Object({}),
   }),
 };
 
@@ -34,6 +35,7 @@ export const resourceUpdateSchema = {
   body: T.Object(
     {
       attributes: T.Array(attributeSchema),
+      payload: T.Object({}),
     },
     { additionalProperties: false }
   ),

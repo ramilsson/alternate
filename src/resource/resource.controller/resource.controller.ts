@@ -40,6 +40,7 @@ export const resourceController: FastifyPluginAsync = async (fastify) => {
               })),
             },
           },
+          payload: request.body.payload,
         },
         include: { attributes: true },
       });
@@ -56,6 +57,7 @@ export const resourceController: FastifyPluginAsync = async (fastify) => {
       const updatedResource = await fastify.database.resource.update({
         where: { id: request.params.id },
         data: {
+          payload: request.body.payload,
           attributes: {
             updateMany: request.body.attributes.map((attr) => ({
               where: { name: attr.name },

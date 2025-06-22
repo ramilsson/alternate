@@ -84,6 +84,7 @@ export const test = testBase.extend<Fixtures>({
     const resource = await server.database.resource.create({
       data: {
         collectionId: oneCollection.id,
+        payload: {},
         attributes: {
           createMany: {
             data: [
@@ -123,9 +124,12 @@ export const test = testBase.extend<Fixtures>({
     const NUMBER_OF_RESOURCES_TO_CREATE = 10;
 
     await server.database.resource.createMany({
-      data: Array(NUMBER_OF_RESOURCES_TO_CREATE).fill({
-        collectionId: oneCollection.id,
-      }),
+      data: Array(NUMBER_OF_RESOURCES_TO_CREATE)
+        .fill(null)
+        .map(() => ({
+          collectionId: oneCollection.id,
+          payload: {},
+        })),
     });
 
     const resources = await server.database.resource.findMany();
