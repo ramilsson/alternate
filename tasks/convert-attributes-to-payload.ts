@@ -1,5 +1,7 @@
 #!/usr/bin/env -S npx tsx
 
+// @ts-nocheck ("Resource" model doesnt have "attributes" anymore)
+
 /**
  * @file This file contains an one-off task that converts resource `attributes` to `payload`.
  */

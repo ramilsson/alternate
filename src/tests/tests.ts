@@ -9,7 +9,6 @@ import { test as testBase } from 'vitest';
 import type { FastifyInstance } from 'fastify';
 import { buildServer } from '../build-server';
 import type { Fixtures } from './types';
-import { AttributeType } from '@prisma/client';
 
 export let server: FastifyInstance | null = null;
 
@@ -84,35 +83,13 @@ export const test = testBase.extend<Fixtures>({
     const resource = await server.database.resource.create({
       data: {
         collectionId: oneCollection.id,
-        payload: {},
-        attributes: {
-          createMany: {
-            data: [
-              {
-                type: AttributeType.LITERAL_STRING,
-                name: 'attributeName1',
-                value: 'attributeValue1',
-              },
-              {
-                type: AttributeType.LITERAL_NUMBER,
-                name: 'attributeName2',
-                value: '1',
-              },
-              {
-                type: AttributeType.LITERAL_BOOLEAN,
-                name: 'attributeName3',
-                value: 'true',
-              },
-              {
-                type: AttributeType.LITERAL_JSON,
-                name: 'attributeName4',
-                value: JSON.stringify({}),
-              },
-            ],
-          },
+        payload: {
+          propertyString: 'string',
+          propertyNumber: 1,
+          propertyBoolean: true,
+          propertyObject: { foo: 'bar' },
         },
       },
-      include: { attributes: true },
     });
 
     await use(resource);

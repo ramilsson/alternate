@@ -34,28 +34,9 @@ model Collection {
 }
 
 model Resource {
-  id           String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  collection   Collection  @relation(fields: [collectionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  collectionId String      @db.Uuid
-  attributes   Attribute[]
+  id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  collectionId String     @db.Uuid
   /// [ResourcePayload]
-  payload      Json        @default("{}")
-}
-
-model Attribute {
-  id         String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  resource   Resource      @relation(fields: [resourceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  resourceId String        @db.Uuid
-  type       AttributeType @default(LITERAL_STRING)
-  name       String        @db.VarChar(64)
-  value      String?       @db.Text
-
-  @@unique([resourceId, name])
-}
-
-enum AttributeType {
-  LITERAL_NUMBER
-  LITERAL_STRING
-  LITERAL_BOOLEAN
-  LITERAL_JSON
+  payload      Json       @default("{}")
 }
