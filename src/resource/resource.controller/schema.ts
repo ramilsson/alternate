@@ -3,6 +3,7 @@ import { Type as T } from '@sinclair/typebox';
 export const resourceListReadSchema = {
   querystring: T.Object({
     collectionId: T.String({ minLength: 1 }),
+    include: T.Optional(T.Array(T.String())),
   }),
 };
 

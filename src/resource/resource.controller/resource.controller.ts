@@ -17,9 +17,10 @@ export const resourceController: FastifyPluginAsync = async (fastify) => {
     method: 'GET',
     schema: resourceListReadSchema,
     handler: async (request) => {
-      return await fastify.database.resource.findMany({
-        where: { collectionId: request.query.collectionId },
-      });
+      return await fastify.database.resource.findManyWithRelated(
+        request.query.collectionId,
+        request.query.include
+      );
     },
   });
 

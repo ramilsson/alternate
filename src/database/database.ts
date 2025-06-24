@@ -1,13 +1,13 @@
 import fastifyPlugin from 'fastify-plugin';
-import { PrismaClient } from '@prisma/client';
-
 import type { FastifyPluginAsync } from 'fastify';
+
+import { createExtendedPrismaClient } from './utils';
 
 /**
  * @TODO https://www.prisma.io/docs/orm/prisma-client/setup-and-configuration/databases-connections#prevent-hot-reloading-from-creating-new-instances-of-prismaclient
  */
 const database: FastifyPluginAsync = async (fastify) => {
-  const prismaClient = new PrismaClient();
+  const prismaClient = createExtendedPrismaClient();
 
   fastify.addHook('onClose', async () => {
     try {
@@ -17,7 +17,7 @@ const database: FastifyPluginAsync = async (fastify) => {
     }
   });
 
-  fastify.decorate<PrismaClient>('database', prismaClient);
+  fastify.decorate<typeof prismaClient>('database', prismaClient);
 };
 
 export default fastifyPlugin(database);

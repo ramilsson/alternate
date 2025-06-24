@@ -1,8 +1,8 @@
-import type { PrismaClient } from '@prisma/client';
+import { PrismaClientExtended } from './types';
 
 declare module 'fastify' {
   interface FastifyInstance {
-    database: PrismaClient;
+    database: PrismaClientExtended;
   }
 }
 
