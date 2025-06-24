@@ -47,9 +47,11 @@ export const resourceModelExtension = Prisma.defineExtension((client) => {
 
           return resources.map((resource) => {
             payloadKeys.forEach((key) => {
-              resource.payload[key] =
-                relatedResources.find((r) => r.id === resource.payload[key]) ||
-                null;
+              const relatedResource = relatedResources.find(
+                (r) => r.id === resource.payload[key]
+              );
+
+              if (relatedResource) resource.payload[key] = relatedResource;
             });
 
             return resource;
