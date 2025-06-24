@@ -1,4 +1,5 @@
 import { Resource, Prisma } from '@prisma/client';
+import { validate } from 'uuid';
 
 export const resourceModelExtension = Prisma.defineExtension((client) => {
   const getRelatedResourceIds = (
@@ -9,8 +10,8 @@ export const resourceModelExtension = Prisma.defineExtension((client) => {
       const payload = resource.payload;
 
       payloadKeys.forEach((key) => {
-        if (key in payload && typeof payload[key] === 'string') {
-          acc.add(payload[key]);
+        if (key in payload && validate(payload[key])) {
+          acc.add(String(payload[key]));
         }
       });
 
