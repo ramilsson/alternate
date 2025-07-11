@@ -1,6 +1,7 @@
 import { describe, expect } from 'vitest';
-import { test } from '../tests';
 import { Resource } from '@prisma/client';
+import { faker } from '@faker-js/faker';
+import { test } from '../tests';
 
 describe('Resource reading', () => {
   test('Cannot read list of resources with no collection id', async ({
@@ -189,4 +190,71 @@ describe('Resource creating/updating', () => {
   });
 });
 
-test.todo('Reading resources with other related resources in payload');
+describe('Reading resources with other related resources in payload', async () => {
+  test('Should populate related resources in response by `populate` query parameter', async ({
+    server,
+    oneProject,
+  }) => {
+    const authorCollection = await server.database.collection.create({
+      data: { projectId: oneProject.id, name: 'Authors' },
+    });
+    const bookCollection = await server.database.collection.create({
+      data: { projectId: oneProject.id, name: 'Books' },
+    });
+    const genreCollection = await server.database.collection.create({
+      data: { projectId: oneProject.id, name: 'Genres' },
+    });
+
+    const authorResource = await server.database.resource.create({
+      data: {
+        collectionId: authorCollection.id,
+        payload: {
+          firstName: faker.person.firstName(),
+          lastName: faker.person.lastName(),
+          bio: faker.person.bio(),
+        },
+      },
+    });
+
+    const genreResource = await server.database.resource.create({
+      data: {
+        collectionId: genreCollection.id,
+        payload: {
+          name: faker.book.genre(),
+          description: faker.lorem.paragraph(),
+        },
+      },
+    });
+
+    const bookResource = await server.database.resource.create({
+      data: {
+        collectionId: bookCollection.id,
+        payload: {
+          title: faker.book.title(),
+          format: faker.book.format(),
+          publisher: faker.book.publisher(),
+
+          author: authorResource.id,
+          genre: genreResource.id,
+        },
+      },
+    });
+
+    const response = await server.inject({
+      url: `/resource`,
+      method: 'GET',
+      query: {
+        collectionId: bookCollection.id,
+        populate: ['author', 'genre'],
+      },
+    });
+
+    const parsedResponseBody: Resource[] = JSON.parse(response.body);
+
+    expect(parsedResponseBody[0].payload).toEqual({
+      ...bookResource.payload,
+      author: authorResource,
+      genre: genreResource,
+    });
+  });
+});
