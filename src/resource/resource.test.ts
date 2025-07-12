@@ -258,3 +258,34 @@ describe('Reading resources with other related resources in payload', async () =
     });
   });
 });
+
+test.only('Resources should have correct createdAt/updatedAt fields', async ({
+  server,
+  oneResource,
+}) => {
+  const response = await server.inject({
+    url: `/resource`,
+    method: 'GET',
+    query: {
+      collectionId: oneResource.collectionId,
+    },
+  });
+
+  const parsedBody: Resource[] = JSON.parse(response.body);
+
+  const resource = parsedBody[0];
+
+  expect(resource).toHaveProperty('createdAt');
+  expect(resource).toHaveProperty('updatedAt');
+
+  const updateResponse = await server.inject({
+    url: `/resource/${oneResource.id}`,
+    method: 'PATCH',
+    payload: { payload: { ...oneResource.payload, newProperty: 'newValue' } },
+  });
+
+  const updatedResource: Resource = JSON.parse(updateResponse.body);
+
+  expect(updatedResource.createdAt).toEqual(resource.createdAt);
+  expect(updatedResource.updatedAt).not.toEqual(resource.updatedAt);
+});
