@@ -26,15 +26,20 @@ export const resourceModelExtension = Prisma.defineExtension((client) => {
       resource: {
         async findManyAndPopulate(
           collectionId: string,
-          populate?: string[]
+          populate?: string
         ): Promise<Resource[]> {
           const resources = await client.resource.findMany({
             where: { collectionId: collectionId },
           });
 
-          if (!populate || !populate.length) return resources;
+          const keysToPopulate = populate?.split(',');
 
-          const relatedResourceIds = getRelatedResourceIds(resources, populate);
+          if (!keysToPopulate || !keysToPopulate.length) return resources;
+
+          const relatedResourceIds = getRelatedResourceIds(
+            resources,
+            keysToPopulate
+          );
 
           if (!relatedResourceIds.length) return resources;
 
@@ -43,7 +48,7 @@ export const resourceModelExtension = Prisma.defineExtension((client) => {
           });
 
           return resources.map((resource) => {
-            populate.forEach((key) => {
+            keysToPopulate.forEach((key) => {
               const relatedResource = relatedResources.find(
                 (r) => r.id === resource.payload[key]
               );

@@ -245,7 +245,7 @@ describe('Reading resources with other related resources in payload', async () =
       method: 'GET',
       query: {
         collectionId: bookCollection.id,
-        populate: ['author', 'genre'],
+        populate: ['author', 'genre'].join(','),
       },
     });
 
