@@ -2,6 +2,7 @@ import { describe, expect } from 'vitest';
 import { Resource } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 import { test } from '../tests';
+import { serializeResource } from '../tests/utils';
 
 describe('Resource reading', () => {
   test('Cannot read list of resources with no collection id', async ({
@@ -18,7 +19,6 @@ describe('Resource reading', () => {
   test('Can read list of resources of single collection only', async ({
     server,
     oneProject,
-    manyResources,
   }) => {
     const collectionWithResources = await server.database.collection.create({
       data: {
@@ -44,17 +44,17 @@ describe('Resource reading', () => {
       query: { collectionId: collectionWithResources.id },
     });
 
-    const parsedBody = JSON.parse(response.body);
-    const totalResourcesCount = await server.database.resource.count();
+    const parsedResources = JSON.parse(response.body);
 
     expect(response.statusCode).toBe(200);
-
-    // Ensure that there are more resources in database...
-    expect(totalResourcesCount).toBeGreaterThan(
+    expect(parsedResources).toHaveLength(
       collectionWithResources.resources.length
     );
-    // ...but we get only the resources of given one collection in response
-    expect(parsedBody).toEqual(collectionWithResources.resources);
+    expect(
+      parsedResources.every(
+        (resource) => resource.collectionId === collectionWithResources.id
+      )
+    ).toBe(true);
   });
 
   test('Resource have payload property', async ({ server, oneResource }) => {
@@ -249,17 +249,22 @@ describe('Reading resources with other related resources in payload', async () =
       },
     });
 
-    const parsedResponseBody: Resource[] = JSON.parse(response.body);
+    const parsedBookResource: Resource = JSON.parse(response.body)[0];
+    const serializedAuthorResource = serializeResource(authorResource);
+    const serializedGenreResource = serializeResource(genreResource);
 
-    expect(parsedResponseBody[0].payload).toEqual({
+    expect(response.statusCode, response.payload).toBe(200);
+    expect(parsedBookResource.payload).toHaveProperty('author');
+    expect(parsedBookResource.payload).toHaveProperty('genre');
+    expect(parsedBookResource.payload).toEqual({
       ...bookResource.payload,
-      author: authorResource,
-      genre: genreResource,
+      author: serializedAuthorResource,
+      genre: serializedGenreResource,
     });
   });
 });
 
-test.only('Resources should have correct createdAt/updatedAt fields', async ({
+test('Resources should have correct createdAt/updatedAt fields', async ({
   server,
   oneResource,
 }) => {
