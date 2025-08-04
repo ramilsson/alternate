@@ -294,3 +294,5 @@ test('Resources should have correct createdAt/updatedAt fields', async ({
   expect(updatedResource.createdAt).toEqual(resource.createdAt);
   expect(updatedResource.updatedAt).not.toEqual(resource.updatedAt);
 });
+
+test.todo("Filtering resource list using 'where' query parameter");

@@ -1,25 +1,41 @@
+import { type FastifyPluginAsync } from 'fastify';
+import qs from 'qs';
+
 import {
   resourceListReadSchema,
   resourceCreateSchema,
   resourceUpdateSchema,
 } from './schema';
 
-import type { FastifyPluginAsync } from 'fastify';
 import type {
   ResourceCreateSchema,
   ResourceUpdateSchema,
   ResourceListReadSchema,
 } from './types';
 
+import { isValidResourceWhereInput } from './utils';
+import { INVALID_WHERE_PARAMETER_MESSAGE } from './const';
+
 export const resourceController: FastifyPluginAsync = async (fastify) => {
   fastify.route<ResourceListReadSchema>({
     url: '/resource',
     method: 'GET',
     schema: resourceListReadSchema,
-    handler: async (request) => {
+    handler: async (request, reply) => {
+      const parsedQuery = qs.parse(request.query);
+
+      if (!isValidResourceWhereInput(parsedQuery.where)) {
+        return reply.code(400).send(new Error(INVALID_WHERE_PARAMETER_MESSAGE));
+      }
+
+      const resourceFindManyAndPopulateParams = {
+        collectionId: request.query.collectionId,
+        populate: request.query.populate?.split(',') || [],
+        where: parsedQuery.where,
+      };
+
       return await fastify.database.resource.findManyAndPopulate(
-        request.query.collectionId,
-        request.query.populate
+        resourceFindManyAndPopulateParams
       );
     },
   });

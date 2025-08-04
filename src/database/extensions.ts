@@ -1,5 +1,6 @@
 import { Resource, Prisma } from '@prisma/client';
 import { validate } from 'uuid';
+import { ResourceFindManyAndPopulateParams } from './types';
 
 export const resourceModelExtension = Prisma.defineExtension((client) => {
   const getRelatedResourceIds = (
@@ -25,21 +26,17 @@ export const resourceModelExtension = Prisma.defineExtension((client) => {
     model: {
       resource: {
         async findManyAndPopulate(
-          collectionId: string,
-          populate?: string
+          params: ResourceFindManyAndPopulateParams
         ): Promise<Resource[]> {
+          const { collectionId, populate, where } = params;
+
           const resources = await client.resource.findMany({
-            where: { collectionId: collectionId },
+            where: { ...where, collectionId: collectionId },
           });
 
-          const keysToPopulate = populate?.split(',');
+          if (!populate || !populate.length) return resources;
 
-          if (!keysToPopulate || !keysToPopulate.length) return resources;
-
-          const relatedResourceIds = getRelatedResourceIds(
-            resources,
-            keysToPopulate
-          );
+          const relatedResourceIds = getRelatedResourceIds(resources, populate);
 
           if (!relatedResourceIds.length) return resources;
 
@@ -48,7 +45,7 @@ export const resourceModelExtension = Prisma.defineExtension((client) => {
           });
 
           return resources.map((resource) => {
-            keysToPopulate.forEach((key) => {
+            populate.forEach((key) => {
               const relatedResource = relatedResources.find(
                 (r) => r.id === resource.payload[key]
               );
