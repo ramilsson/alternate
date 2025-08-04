@@ -22,7 +22,7 @@ export const resourceController: FastifyPluginAsync = async (fastify) => {
     method: 'GET',
     schema: resourceListReadSchema,
     handler: async (request, reply) => {
-      const parsedQuery = qs.parse(request.query);
+      const parsedQuery = qs.parse(request.query, { comma: true });
 
       if (!isValidResourceWhereInput(parsedQuery.where)) {
         return reply.code(400).send(new Error(INVALID_WHERE_PARAMETER_MESSAGE));
