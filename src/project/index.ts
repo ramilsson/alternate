@@ -1,1 +1,1 @@
-export { project } from './project';
+export { project } from './project.js';

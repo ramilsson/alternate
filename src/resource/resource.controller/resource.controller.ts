@@ -5,16 +5,16 @@ import {
   resourceListReadSchema,
   resourceCreateSchema,
   resourceUpdateSchema,
-} from './schema';
+} from './schema.js';
 
 import type {
   ResourceCreateSchema,
   ResourceUpdateSchema,
   ResourceListReadSchema,
-} from './types';
+} from './types.js';
 
-import { isValidResourceWhereInput } from './utils';
-import { INVALID_WHERE_PARAMETER_MESSAGE } from './const';
+import { isValidResourceWhereInput } from './utils.js';
+import { INVALID_WHERE_PARAMETER_MESSAGE } from './const.js';
 
 export const resourceController: FastifyPluginAsync = async (fastify) => {
   fastify.route<ResourceListReadSchema>({

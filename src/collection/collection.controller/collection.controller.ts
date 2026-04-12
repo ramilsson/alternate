@@ -1,7 +1,7 @@
-import { collectionListReadSchema, collectionCreateSchema } from './schema';
+import { collectionListReadSchema, collectionCreateSchema } from './schema.js';
 
 import type { FastifyPluginAsync } from 'fastify';
-import type { CollectionListReadSchema, CollectionCreateSchema } from './types';
+import type { CollectionListReadSchema, CollectionCreateSchema } from './types.js';
 
 export const collectionController: FastifyPluginAsync = async (fastify) => {
   fastify.route<CollectionListReadSchema>({

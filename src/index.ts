@@ -1,5 +1,5 @@
-import { buildServer } from './build-server';
-import { serverOptions } from './settings';
+import { buildServer } from './build-server.js';
+import { serverOptions } from './settings.js';
 
 const server = buildServer(serverOptions);
 

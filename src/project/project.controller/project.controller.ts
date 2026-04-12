@@ -1,8 +1,8 @@
 import { Prisma } from '@prisma/client';
-import { projectCreateSchema } from './schema';
+import { projectCreateSchema } from './schema.js';
 
 import type { FastifyPluginAsync } from 'fastify';
-import type { ProjectCreateSchema } from './types';
+import type { ProjectCreateSchema } from './types.js';
 
 export const projectController: FastifyPluginAsync = async (fastify) => {
   fastify.setErrorHandler((error, request, reply) => {

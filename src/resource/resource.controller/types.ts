@@ -2,7 +2,7 @@ import {
   resourceListReadSchema,
   resourceCreateSchema,
   resourceUpdateSchema,
-} from './schema';
+} from './schema.js';
 
 import type { Static } from '@sinclair/typebox';
 

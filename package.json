@@ -2,6 +2,7 @@
   "name": "alternate",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "module": "index.ts",
   "scripts": {
     "dev": "npx tsx watch src/index.ts",
@@ -30,7 +31,7 @@
     "dotenv-cli": "^7.4.2",
     "pino-pretty": "^11.0.0",
     "prisma": "^5.12.1",
-    "typescript": "^5.4.5",
+    "typescript": "^5.9.3",
     "vitest": "^2.0.4"
   },
   "engines": {

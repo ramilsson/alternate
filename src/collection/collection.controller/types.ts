@@ -1,4 +1,4 @@
-import { collectionListReadSchema, collectionCreateSchema } from './schema';
+import { collectionListReadSchema, collectionCreateSchema } from './schema.js';
 
 import type { Static } from '@sinclair/typebox';
 

@@ -1,5 +1,5 @@
 import { Prisma } from '@prisma/client';
-import { createExtendedPrismaClient } from './utils';
+import { createExtendedPrismaClient } from './utils.js';
 
 export interface ResourceFindManyAndPopulateParams {
   collectionId: string;

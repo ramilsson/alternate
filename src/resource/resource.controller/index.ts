@@ -1,1 +1,1 @@
-export { resourceController } from './resource.controller';
+export { resourceController } from './resource.controller.js';

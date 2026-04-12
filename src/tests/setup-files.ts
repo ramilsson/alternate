@@ -1,5 +1,5 @@
 import { afterEach, afterAll } from 'vitest';
-import { server } from './tests';
+import { server } from './tests.js';
 
 afterEach(async () => {
   if (!server) return;

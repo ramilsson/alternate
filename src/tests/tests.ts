@@ -7,8 +7,8 @@
 
 import { test as testBase } from 'vitest';
 import type { FastifyInstance } from 'fastify';
-import { buildServer } from '../build-server';
-import type { Fixtures } from './types';
+import { buildServer } from '../build-server.js';
+import type { Fixtures } from './types.js';
 
 export let server: FastifyInstance | null = null;
 

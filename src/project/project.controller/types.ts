@@ -1,4 +1,4 @@
-import { projectCreateSchema } from './schema';
+import { projectCreateSchema } from './schema.js';
 
 import type { Static } from '@sinclair/typebox';
 

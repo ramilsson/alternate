@@ -1,6 +1,6 @@
 import { Resource, Prisma } from '@prisma/client';
 import { validate } from 'uuid';
-import { ResourceFindManyAndPopulateParams } from './types';
+import { ResourceFindManyAndPopulateParams } from './types.js';
 
 export const resourceModelExtension = Prisma.defineExtension((client) => {
   const getRelatedResourceIds = (

@@ -1,1 +1,1 @@
-export { resource } from './resource';
+export { resource } from './resource.js';

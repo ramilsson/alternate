@@ -1,1 +1,1 @@
-export { collectionController } from './collection.controller';
+export { collectionController } from './collection.controller.js';
