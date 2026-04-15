@@ -44,16 +44,14 @@ describe('Resource reading', () => {
       query: { collectionId: collectionWithResources.id },
     });
 
-    const parsedResources = JSON.parse(response.body);
+    const resources: Resource[] = response.json();
 
     expect(response.statusCode).toBe(200);
-    expect(parsedResources).toHaveLength(
-      collectionWithResources.resources.length
-    );
+    expect(resources).toHaveLength(collectionWithResources.resources.length);
     expect(
-      parsedResources.every(
-        (resource) => resource.collectionId === collectionWithResources.id
-      )
+      resources.every(
+        (resource) => resource.collectionId === collectionWithResources.id,
+      ),
     ).toBe(true);
   });
 
@@ -146,7 +144,7 @@ describe('Resource creating/updating', () => {
       null, // null
       'string', // string
       0, // number
-      Array[0], // array
+      [], // array
       true, // boolean
     ];
 
