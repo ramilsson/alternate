@@ -10,7 +10,7 @@ async function runMigrations() {
 }
 
 export default async function setup() {
-  console.log('Setup...');
+  console.log('Database setup...');
 
   const container = await new PostgreSqlContainer(process.env.DATABASE_IMAGE)
     .withDatabase(String(process.env.DATABASE_NAME))
@@ -29,7 +29,7 @@ export default async function setup() {
   await runMigrations();
 
   return async function teardown() {
-    console.log('Teardown...');
+    console.log('Database teardown...');
 
     await container.stop();
 

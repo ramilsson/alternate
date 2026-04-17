@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import type { Prisma, Object as BaseObject } from '@prisma/client';
 import { createExtendedPrismaClient } from './utils.js';
 
 export interface ResourceFindManyAndPopulateParams {
@@ -10,3 +10,7 @@ export interface ResourceFindManyAndPopulateParams {
 export type PrismaClientExtended = ReturnType<
   typeof createExtendedPrismaClient
 >;
+
+export interface Object extends BaseObject {
+  name: string;
+}

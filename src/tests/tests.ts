@@ -5,8 +5,10 @@
  * @see https://vitest.dev/guide/improving-performance
  */
 
-import { test as testBase } from 'vitest';
 import type { FastifyInstance } from 'fastify';
+import { inject, test as testBase } from 'vitest';
+import { Client as MinioClient } from 'minio';
+
 import { buildServer } from '../build-server.js';
 import type { Fixtures } from './types.js';
 
@@ -15,7 +17,16 @@ export let server: FastifyInstance | null = null;
 export const test = testBase.extend<Fixtures>({
   server: async ({}, use) => {
     if (!server) {
-      server = buildServer();
+      server = buildServer({
+        minioOptions: {
+          host: inject('MINIO_HOST'),
+          port: inject('MINIO_PORT'),
+          accessKey: inject('MINIO_ACCESS_KEY'),
+          secretKey: inject('MINIO_SECRET_KEY'),
+          bucketName: inject('MINIO_BUCKET_NAME'),
+          useSSL: false,
+        },
+      });
     }
 
     await use(server);
@@ -113,5 +124,52 @@ export const test = testBase.extend<Fixtures>({
     await use(resources);
 
     await server.database.resource.deleteMany();
+  },
+
+  minioClient: async ({}, use) => {
+    const minioOptions = {
+      host: inject('MINIO_HOST'),
+      port: inject('MINIO_PORT'),
+      accessKey: inject('MINIO_ACCESS_KEY'),
+      secretKey: inject('MINIO_SECRET_KEY'),
+      bucketName: inject('MINIO_BUCKET_NAME'),
+      useSSL: false,
+    };
+
+    const minioClient = new MinioClient({
+      endPoint: minioOptions.host,
+      port: minioOptions.port,
+      useSSL: minioOptions.useSSL,
+      accessKey: minioOptions.accessKey,
+      secretKey: minioOptions.secretKey,
+    });
+
+    await use(minioClient);
+  },
+
+  bucketName: async ({}, use) => {
+    await use(inject('MINIO_BUCKET_NAME'));
+  },
+
+  oneFile: async ({}, use) => {
+    const file = {
+      name: 'file.md',
+      content: new Blob(['Content of the file']),
+    };
+
+    await use(file);
+  },
+
+  oneObject: async ({ server, oneFile, oneResource }, use) => {
+    const object = await server.database.object.create({
+      data: {
+        resourceId: oneResource.id,
+        fileName: oneFile.name,
+      },
+    });
+
+    await use(object);
+
+    await server.database.object.deleteMany();
   },
 });

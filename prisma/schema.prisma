@@ -41,4 +41,22 @@ model Resource {
   payload      Json       @default("{}")
   createdAt    DateTime   @default(now())
   updatedAt    DateTime?  @updatedAt
+  objects      Object[]
+}
+
+model Object {
+  id         String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  fileName   String       @db.VarChar(64)
+  resource   Resource     @relation(fields: [resourceId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  resourceId String       @db.Uuid
+  status     ObjectStatus @default(DRAFT)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime?    @updatedAt
+
+  @@unique([resourceId, fileName])
+}
+
+enum ObjectStatus {
+  DRAFT
+  UPLOADED
 }

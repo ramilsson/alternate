@@ -7,6 +7,7 @@ afterEach(async () => {
   await server.database.project.deleteMany();
   await server.database.collection.deleteMany();
   await server.database.resource.deleteMany();
+  await server.database.object.deleteMany();
 });
 
 afterAll(async () => {
