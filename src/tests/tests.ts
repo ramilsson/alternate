@@ -16,7 +16,6 @@ export const test = testBase.extend<Fixtures>({
   server: async ({}, use) => {
     if (!server) {
       server = buildServer();
-      await server.ready();
     }
 
     await use(server);
