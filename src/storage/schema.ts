@@ -14,6 +14,7 @@ export const objectCreateSchema = {
   body: T.Object({
     resourceId: T.String({ minLength: 1 }),
     fileName: T.String({ minLength: 1 }),
+    key: T.Optional(T.String({ minLength: 1 })),
   }),
 };
 

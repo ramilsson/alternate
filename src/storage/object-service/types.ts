@@ -14,8 +14,7 @@ export interface Object extends DatabaseObject {
 export interface ObjectService {
   readObjectList: (resourceId: Object['resourceId']) => Promise<Object[]>;
   createObject: (
-    resourceId: Object['resourceId'],
-    data: Pick<Object, 'fileName'>,
+    data: Pick<Object, 'resourceId' | 'fileName'> & { key?: Object['key'] },
   ) => Promise<Object>;
   updateObject: (
     id: Object['id'],

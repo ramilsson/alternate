@@ -49,7 +49,6 @@ export const storage: FastifyPluginAsync<StorageOptions> = async (
     schema: objectCreateSchema,
     handler: async (request, reply) => {
       const createdObject = await fastify.objectService.createObject(
-        request.body.resourceId,
         request.body,
       );
 

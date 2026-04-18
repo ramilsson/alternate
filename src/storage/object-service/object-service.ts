@@ -45,13 +45,8 @@ const objectService: FastifyPluginAsync<ObjectServiceOptions> = async (
     return Promise.all(objects.map(transformObject));
   };
 
-  const createObject: ObjectService['createObject'] = async (
-    resourceId,
-    data,
-  ) => {
-    const createdObject = await fastify.database.object.create({
-      data: { resourceId: resourceId, fileName: data.fileName },
-    });
+  const createObject: ObjectService['createObject'] = async (data) => {
+    const createdObject = await fastify.database.object.create({ data });
 
     return await transformObject(createdObject);
   };
