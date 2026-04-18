@@ -18,7 +18,7 @@ export const buildServer = (options: Options) => {
 
   fastifyServer.register(cors, {
     origin: true,
-    credentials: true,
+    methods: 'GET,HEAD,POST,PATCH,PUT,DELETE',
   });
 
   fastifyServer.register(database);
