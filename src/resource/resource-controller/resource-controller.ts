@@ -50,6 +50,9 @@ export const resourceController: FastifyPluginAsync<
     handler: async (request, reply) => {
       const resource = await resourceService.readResource({
         resourceId: request.params.id,
+        include: {
+          objects: Boolean(request.query.include?.includes('objects')),
+        },
       });
 
       return resource;

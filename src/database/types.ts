@@ -16,3 +16,7 @@ export type { Resource };
 export interface Object extends BaseObject {
   name: string;
 }
+
+export interface ResourceWithObjects extends Resource {
+  objects: Object[];
+}

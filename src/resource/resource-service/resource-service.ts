@@ -2,18 +2,28 @@ import { type FastifyPluginAsync } from 'fastify';
 import { fastifyPlugin } from 'fastify-plugin';
 import { validate as validateGuid } from 'uuid';
 
-import type {
-  Resource,
-  ResourceService,
-  ResourceServiceOptions,
-} from './types.js';
+import type { Resource, ResourceService } from './types.js';
+import { objectService } from '../../storage/object-service/index.js';
 
-const resourceService: FastifyPluginAsync<ResourceServiceOptions> = async (
-  fastify,
-) => {
+const resourceService: FastifyPluginAsync = async (fastify) => {
+  fastify.register(objectService);
+
+  const transformResource: ResourceService['transformResource'] = async (
+    resource,
+  ) => {
+    if (!('objects' in resource)) return resource;
+
+    const objects = await Promise.all(
+      resource.objects.map(fastify.objectService.transformObject),
+    );
+
+    return { ...resource, objects };
+  };
+
   const readResource: ResourceService['readResource'] = async (params) => {
     const resource = await fastify.database.resource.findUniqueOrThrow({
       where: { id: params.resourceId },
+      include: params.include,
     });
 
     if (params.populate?.length) {
@@ -40,7 +50,7 @@ const resourceService: FastifyPluginAsync<ResourceServiceOptions> = async (
       });
     }
 
-    return resource;
+    return await transformResource(resource);
   };
 
   const readResourceList: ResourceService['readResourceList'] = async (
@@ -76,6 +86,7 @@ const resourceService: FastifyPluginAsync<ResourceServiceOptions> = async (
   };
 
   fastify.decorate<ResourceService>('resourceService', {
+    transformResource,
     readResource,
     readResourceList,
     createResource,

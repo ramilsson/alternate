@@ -33,6 +33,7 @@ describe('Resource service', () => {
 
     expect(resource).toMatchObject(newResource);
   });
+
   test('Read one resource with populated payload property', async ({
     collectionFactory,
     resourceFactory,
@@ -56,5 +57,21 @@ describe('Resource service', () => {
     expect(newResource).toMatchObject({
       payload: { resourceIdToPopulate: resource },
     });
+  });
+
+  test('Read one resource including its objects', async ({
+    resourceService,
+    oneObject,
+  }) => {
+    const resource = await resourceService.readResource({
+      resourceId: oneObject.resourceId,
+      include: { objects: true },
+    });
+
+    const objects = resource.objects;
+    const object = objects?.at(0);
+
+    expect(objects).toBeTruthy();
+    expect(object?.url).toBeTruthy();
   });
 });
