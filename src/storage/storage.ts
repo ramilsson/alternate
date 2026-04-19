@@ -1,5 +1,4 @@
 import { type FastifyPluginAsync } from 'fastify';
-import * as Minio from 'minio';
 
 import { objectService } from './object-service/index.js';
 
@@ -12,25 +11,8 @@ import {
   ObjectUpdateSchema,
 } from './schema.js';
 
-import { StorageOptions } from './types.js';
-
-export const storage: FastifyPluginAsync<StorageOptions> = async (
-  fastify,
-  options,
-) => {
-  const { minioOptions } = options;
-
-  const minioClient = new Minio.Client({
-    endPoint: minioOptions.host,
-    port: minioOptions.port,
-    useSSL: minioOptions.useSSL,
-    accessKey: minioOptions.accessKey,
-    secretKey: minioOptions.secretKey,
-  });
-
-  const bucketName = minioOptions.bucketName;
-
-  fastify.register(objectService, { minioClient, bucketName });
+export const storage: FastifyPluginAsync = async (fastify) => {
+  fastify.register(objectService);
 
   fastify.route<ObjectListReadSchema>({
     method: 'GET',

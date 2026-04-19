@@ -3,13 +3,10 @@ import { fastifyPlugin } from 'fastify-plugin';
 import mime from 'mime';
 
 import { Object as DatabaseObject } from '../../database/types.js';
-import { Object, ObjectService, ObjectServiceOptions } from './types.js';
+import { Object, ObjectService } from './types.js';
 
-const objectService: FastifyPluginAsync<ObjectServiceOptions> = async (
-  fastify,
-  options,
-) => {
-  const { minioClient, bucketName } = options;
+const objectService: FastifyPluginAsync = async (fastify) => {
+  const { client: minioClient, bucketName } = fastify.minio;
 
   const getPresignedPostPolicy = async (object: DatabaseObject) => {
     const policy = minioClient.newPostPolicy();
@@ -61,6 +58,7 @@ const objectService: FastifyPluginAsync<ObjectServiceOptions> = async (
   };
 
   fastify.decorate<ObjectService>('objectService', {
+    transformObject,
     readObjectList,
     createObject,
     updateObject,

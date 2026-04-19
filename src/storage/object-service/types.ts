@@ -1,10 +1,5 @@
-import type { Client as MinioClient, PostPolicyResult } from 'minio';
+import type { PostPolicyResult } from 'minio';
 import { Object as DatabaseObject } from '../../database/types.js';
-
-export interface ObjectServiceOptions {
-  minioClient: MinioClient;
-  bucketName: string;
-}
 
 export interface Object extends DatabaseObject {
   url: string | null;
@@ -12,6 +7,8 @@ export interface Object extends DatabaseObject {
 }
 
 export interface ObjectService {
+  transformObject: (object: DatabaseObject) => Promise<Object>;
+
   readObjectList: (resourceId: Object['resourceId']) => Promise<Object[]>;
   createObject: (
     data: Pick<Object, 'resourceId' | 'fileName'> & { key?: Object['key'] },

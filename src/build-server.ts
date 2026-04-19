@@ -35,10 +35,7 @@ export const buildServer = (options: Options) => {
   fastifyServer.register(project);
   fastifyServer.register(collection);
   fastifyServer.register(resource);
-
-  if (minioOptions) {
-    fastifyServer.register(storage, { minioOptions });
-  }
+  fastifyServer.register(storage);
 
   return fastifyServer;
 };
