@@ -11,15 +11,20 @@ import type {
   ResourceCreateSchema,
   ResourceUpdateSchema,
   ResourceListReadSchema,
+  ResourceControllerOptions,
 } from './types.js';
 
 import { isValidResourceWhereInput } from './utils.js';
 import { INVALID_WHERE_PARAMETER_MESSAGE } from './const.js';
 
-export const resourceController: FastifyPluginAsync = async (fastify) => {
+export const resourceController: FastifyPluginAsync<
+  ResourceControllerOptions
+> = async (fastify, options) => {
+  const resourceService = options.resourceService;
+
   fastify.route<ResourceListReadSchema>({
-    url: '/resource',
     method: 'GET',
+    url: '/resource',
     schema: resourceListReadSchema,
     handler: async (request, reply) => {
       const parsedQuery = qs.parse(request.query, { comma: true });
@@ -28,28 +33,22 @@ export const resourceController: FastifyPluginAsync = async (fastify) => {
         return reply.code(400).send(new Error(INVALID_WHERE_PARAMETER_MESSAGE));
       }
 
-      const resourceFindManyAndPopulateParams = {
+      return await resourceService.readResourceList({
         collectionId: request.query.collectionId,
         populate: request.query.populate?.split(',') || [],
         where: parsedQuery.where,
-      };
-
-      return await fastify.database.resource.findManyAndPopulate(
-        resourceFindManyAndPopulateParams
-      );
+      });
     },
   });
 
   fastify.route<ResourceCreateSchema>({
-    url: '/resource',
     method: 'POST',
+    url: '/resource',
     schema: resourceCreateSchema,
     handler: async (request, reply) => {
-      const createdResource = await fastify.database.resource.create({
-        data: {
-          collectionId: request.body.collectionId,
-          payload: request.body.payload,
-        },
+      const createdResource = await resourceService.createResource({
+        collectionId: request.body.collectionId,
+        payload: request.body.payload,
       });
 
       return reply.code(201).send(createdResource);
@@ -57,16 +56,14 @@ export const resourceController: FastifyPluginAsync = async (fastify) => {
   });
 
   fastify.route<ResourceUpdateSchema>({
-    url: '/resource/:id',
     method: 'PATCH',
+    url: '/resource/:id',
     schema: resourceUpdateSchema,
     handler: async (request, reply) => {
-      const updatedResource = await fastify.database.resource.update({
-        where: { id: request.params.id },
-        data: {
-          payload: request.body.payload,
-        },
-      });
+      const updatedResource = await resourceService.updateResource(
+        request.params.id,
+        { payload: request.body.payload },
+      );
 
       return reply.code(200).send(updatedResource);
     },

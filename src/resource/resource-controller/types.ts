@@ -1,10 +1,16 @@
+import type { Static } from '@sinclair/typebox';
+
+import { ResourceService } from '../resource-service/index.js';
+
 import {
   resourceListReadSchema,
   resourceCreateSchema,
   resourceUpdateSchema,
 } from './schema.js';
 
-import type { Static } from '@sinclair/typebox';
+export interface ResourceControllerOptions {
+  resourceService: ResourceService;
+}
 
 export type ResourceListReadSchema = {
   Querystring: Static<(typeof resourceListReadSchema)['querystring']>;
