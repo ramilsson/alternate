@@ -1,14 +1,22 @@
 import Fastify, { fastify, type FastifyServerOptions } from 'fastify';
 import cors from '@fastify/cors';
 import database from './database/index.js';
+import { minio } from './minio/index.js';
 import { project } from './project/index.js';
 import { collection } from './collection/index.js';
 import { resource } from './resource/index.js';
-import { storage, type StorageOptions } from './storage/index.js';
+import { storage } from './storage/index.js';
 
 interface Options {
   serverOptions?: FastifyServerOptions;
-  minioOptions?: StorageOptions['minioOptions'];
+  minioOptions: {
+    host: string;
+    port: number;
+    accessKey: string;
+    secretKey: string;
+    useSSL: boolean;
+    bucketName: string;
+  };
 }
 
 export const buildServer = (options: Options) => {
@@ -22,6 +30,7 @@ export const buildServer = (options: Options) => {
   });
 
   fastifyServer.register(database);
+  fastifyServer.register(minio, minioOptions);
 
   fastifyServer.register(project);
   fastifyServer.register(collection);
