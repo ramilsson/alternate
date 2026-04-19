@@ -1,5 +1,14 @@
 import { Type as T } from '@sinclair/typebox';
 
+export const resourceReadSchema = {
+  params: T.Object({
+    id: T.String({ minLength: 1 }),
+  }),
+  querystring: T.Object({
+    populate: T.Optional(T.String({ minLength: 1 })),
+  }),
+};
+
 export const resourceListReadSchema = {
   querystring: T.Object({
     collectionId: T.String({ minLength: 1 }),
@@ -22,6 +31,6 @@ export const resourceUpdateSchema = {
     {
       payload: T.Object({}),
     },
-    { additionalProperties: false }
+    { additionalProperties: false },
   ),
 };

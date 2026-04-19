@@ -2,15 +2,17 @@ import { type FastifyPluginAsync } from 'fastify';
 import qs from 'qs';
 
 import {
+  resourceReadSchema,
   resourceListReadSchema,
   resourceCreateSchema,
   resourceUpdateSchema,
 } from './schema.js';
 
 import type {
+  ResourceReadSchema,
+  ResourceListReadSchema,
   ResourceCreateSchema,
   ResourceUpdateSchema,
-  ResourceListReadSchema,
   ResourceControllerOptions,
 } from './types.js';
 
@@ -38,6 +40,19 @@ export const resourceController: FastifyPluginAsync<
         populate: request.query.populate?.split(',') || [],
         where: parsedQuery.where,
       });
+    },
+  });
+
+  fastify.route<ResourceReadSchema>({
+    method: 'GET',
+    url: '/resource/:id',
+    schema: resourceReadSchema,
+    handler: async (request, reply) => {
+      const resource = await resourceService.readResource({
+        resourceId: request.params.id,
+      });
+
+      return resource;
     },
   });
 

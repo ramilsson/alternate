@@ -6,6 +6,10 @@ import {
 export interface ResourceServiceOptions {}
 
 export interface ResourceService {
+  readResource: (params: {
+    resourceId: Resource['id'];
+    populate?: string[];
+  }) => Promise<Resource>;
   readResourceList: (
     params: ResourceFindManyAndPopulateParams,
   ) => Promise<Resource[]>;

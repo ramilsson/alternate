@@ -8,6 +8,7 @@
 import type { FastifyInstance } from 'fastify';
 import { inject, test as testBase } from 'vitest';
 import { Client as MinioClient } from 'minio';
+import { faker } from '@faker-js/faker';
 
 import { buildServer } from '../build-server.js';
 import type { Fixtures } from './types.js';
@@ -89,6 +90,16 @@ export const test = testBase.extend<Fixtures>({
     await server.database.collection.deleteMany();
   },
 
+  collectionFactory: async ({ server, oneProject }, use) => {
+    const createCollection = async () => {
+      return await server.database.collection.create({
+        data: { name: faker.string.alpha(8), projectId: oneProject.id },
+      });
+    };
+
+    await use({ createCollection });
+  },
+
   oneResource: async ({ server, oneCollection }, use) => {
     const resource = await server.database.resource.create({
       data: {
@@ -124,6 +135,24 @@ export const test = testBase.extend<Fixtures>({
     await use(resources);
 
     await server.database.resource.deleteMany();
+  },
+
+  resourceFactory: async ({ server, oneCollection }, use) => {
+    const createResource = async () => {
+      return await server.database.resource.create({
+        data: {
+          collectionId: oneCollection.id,
+          payload: {
+            propertyString: 'string',
+            propertyNumber: 1,
+            propertyBoolean: true,
+            propertyObject: { foo: 'bar' },
+          },
+        },
+      });
+    };
+
+    await use({ createResource });
   },
 
   minioClient: async ({}, use) => {

@@ -17,8 +17,12 @@ export interface Fixtures {
   oneCollection: Collection;
   manyCollections: Collection[];
 
+  collectionFactory: { createCollection: () => Promise<Collection> };
+
   oneResource: Resource;
   manyResources: Resource[];
+
+  resourceFactory: { createResource: () => Promise<Resource> };
 
   minioClient: MinioClient;
   bucketName: string;
