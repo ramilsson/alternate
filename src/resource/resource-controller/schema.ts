@@ -6,7 +6,7 @@ export const resourceReadSchema = {
   }),
   querystring: T.Object({
     populate: T.Optional(T.String({ minLength: 1 })),
-    include: T.Optional(T.Array(T.Literal('objects'))),
+    include: T.Optional(T.String({ minLength: 1 })),
   }),
 };
 
