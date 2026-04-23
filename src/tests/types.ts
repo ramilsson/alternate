@@ -16,16 +16,36 @@ export interface Fixtures {
 
   oneCollection: Collection;
   manyCollections: Collection[];
-
-  collectionFactory: { createCollection: () => Promise<Collection> };
+  collectionFactory: {
+    /**
+     * Creates and returns a new collection
+     * @returns The created collection
+     */
+    createCollection: () => Promise<Collection>;
+  };
 
   oneResource: Resource;
   manyResources: Resource[];
-
-  resourceFactory: { createResource: () => Promise<Resource> };
+  resourceFactory: {
+    /**
+     * Creates a new resource in the specified collection
+     * @param collection - The collection to create the resource in
+     * @returns The created resource
+     */
+    createResource: (collection: Collection) => Promise<Resource>;
+  };
 
   minioClient: MinioClient;
   bucketName: string;
   oneFile: File;
   oneObject: Object;
+
+  objectFactory: {
+    /**
+     * Creates a new object using the `oneFile` fixture for the specified resource
+     * @param resource - The resource to create the object in
+     * @returns The created object
+     */
+    createObject: (resource: Resource) => Promise<Object>;
+  };
 }

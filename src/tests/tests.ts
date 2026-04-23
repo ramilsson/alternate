@@ -138,10 +138,10 @@ export const test = testBase.extend<Fixtures>({
   },
 
   resourceFactory: async ({ server, oneCollection }, use) => {
-    const createResource = async () => {
+    const createResource = async (collection = oneCollection) => {
       return await server.database.resource.create({
         data: {
-          collectionId: oneCollection.id,
+          collectionId: collection.id,
           payload: {
             propertyString: 'string',
             propertyNumber: 1,
@@ -200,5 +200,18 @@ export const test = testBase.extend<Fixtures>({
     await use(object);
 
     await server.database.object.deleteMany();
+  },
+
+  objectFactory: async ({ server, oneFile }, use) => {
+    const createObject = async (resource: Fixtures['oneResource']) => {
+      return await server.database.object.create({
+        data: {
+          resourceId: resource.id,
+          fileName: oneFile.name,
+        },
+      });
+    };
+
+    await use({ createObject });
   },
 });
