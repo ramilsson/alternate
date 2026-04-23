@@ -39,6 +39,9 @@ export const resourceController: FastifyPluginAsync<
         collectionId: request.query.collectionId,
         populate: request.query.populate?.split(',') || [],
         where: parsedQuery.where,
+        include: {
+          objects: Boolean(request.query.include?.includes('objects')),
+        },
       });
     },
   });

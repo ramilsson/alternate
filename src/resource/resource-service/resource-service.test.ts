@@ -3,6 +3,7 @@ import { describe, expect } from 'vitest';
 import resourceService from './resource-service.js';
 import { ResourceService } from './types.js';
 import { test as testBase } from '../../tests/index.js';
+import { inspect } from 'node:util';
 
 interface Fixtures {
   resourceService: ResourceService;
@@ -24,8 +25,9 @@ describe('Resource service', () => {
   test('Read one resource by id', async ({
     resourceService,
     resourceFactory,
+    oneCollection,
   }) => {
-    const newResource = await resourceFactory.createResource();
+    const newResource = await resourceFactory.createResource(oneCollection);
 
     const resource = await resourceService.readResource({
       resourceId: newResource.id,
@@ -38,13 +40,14 @@ describe('Resource service', () => {
     collectionFactory,
     resourceFactory,
     resourceService,
+    oneCollection,
   }) => {
-    const resource = await resourceFactory.createResource();
-    const collection = await collectionFactory.createCollection();
+    const resource = await resourceFactory.createResource(oneCollection);
+    const newCollection = await collectionFactory.createCollection();
 
     // Create new resource in new collection with a reference to other existing resource
     const { id: newResourceId } = await resourceService.createResource({
-      collectionId: collection.id,
+      collectionId: newCollection.id,
       payload: { resourceIdToPopulate: resource.id },
     });
 
@@ -71,7 +74,35 @@ describe('Resource service', () => {
     const objects = resource.objects;
     const object = objects?.at(0);
 
-    expect(objects).toBeTruthy();
-    expect(object?.url).toBeTruthy();
+    expect(objects).toBeDefined();
+    expect(object).toHaveProperty('url');
+  });
+
+  test('Read resource list including their objects', async ({
+    resourceService,
+    objectFactory,
+    resourceFactory,
+    oneCollection,
+  }) => {
+    const newResource = await resourceFactory.createResource(oneCollection);
+    const newObject = await objectFactory.createObject(newResource);
+
+    const resources = await resourceService.readResourceList({
+      collectionId: newResource.collectionId,
+      include: { objects: true },
+    });
+
+    console.log(inspect(resources, true, 8));
+
+    // Check if resources have objects array:
+    const hasObjectsArray = resources.every((r) => Array.isArray(r.objects));
+
+    expect(hasObjectsArray).toBeTruthy();
+
+    // Check the first object's structure:
+    const object = resources.at(0)?.objects?.at(0);
+
+    expect(object).toBeDefined();
+    expect(object).toHaveProperty('url');
   });
 });

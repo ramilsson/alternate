@@ -5,6 +5,7 @@ export interface ResourceFindManyAndPopulateParams {
   collectionId: string;
   populate?: string[];
   where?: Omit<Prisma.ResourceWhereInput, 'collection' | 'collectionId'>;
+  include?: Pick<Prisma.ResourceInclude, 'objects'>;
 }
 
 export type PrismaClientExtended = ReturnType<

@@ -60,9 +60,10 @@ const resourceService: FastifyPluginAsync = async (fastify) => {
       collectionId: params.collectionId,
       where: params.where,
       populate: params.populate,
+      include: params.include,
     });
 
-    return resources;
+    return await Promise.all(resources.map(transformResource));
   };
 
   const createResource: ResourceService['createResource'] = async (data) => {
