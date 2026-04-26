@@ -1,7 +1,7 @@
-import type { GlobalSetupContext } from 'vitest/node';
+import type { TestProject } from 'vitest/node';
 import { GenericContainer, Network } from 'testcontainers';
 
-export default async function setup({ provide }: GlobalSetupContext) {
+export default async function setup({ provide }: TestProject) {
   console.log('Minio setup...');
 
   const network = await new Network().start();
