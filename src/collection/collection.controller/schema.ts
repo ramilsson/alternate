@@ -18,3 +18,15 @@ export const collectionCreateSchema = {
     name: T.String({ minLength: 1 }),
   }),
 };
+
+export const collectionUpdateSchema = {
+  params: T.Object({
+    id: T.String({ minLength: 1 }),
+  }),
+  body: T.Object(
+    {
+      schema: T.Optional(T.Object({})),
+    },
+    { additionalProperties: false },
+  ),
+};

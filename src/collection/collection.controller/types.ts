@@ -2,6 +2,7 @@ import {
   collectionListReadSchema,
   collectionCreateSchema,
   collectionReadSchema,
+  collectionUpdateSchema,
 } from './schema.js';
 
 import type { Static } from '@sinclair/typebox';
@@ -16,4 +17,9 @@ export type CollectionReadSchema = {
 
 export type CollectionCreateSchema = {
   Body: Static<(typeof collectionCreateSchema)['body']>;
+};
+
+export type CollectionUpdateSchema = {
+  Params: Static<(typeof collectionUpdateSchema)['params']>;
+  Body: Static<(typeof collectionUpdateSchema)['body']>;
 };

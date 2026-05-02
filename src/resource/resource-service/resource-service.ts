@@ -1,12 +1,15 @@
 import { type FastifyPluginAsync } from 'fastify';
 import { fastifyPlugin } from 'fastify-plugin';
 import { validate as validateGuid } from 'uuid';
+import { Ajv } from 'ajv';
 
 import type { Resource, ResourceService } from './types.js';
 import { objectService } from '../../storage/object-service/index.js';
 
 const resourceService: FastifyPluginAsync = async (fastify) => {
   fastify.register(objectService);
+
+  const ajv = new Ajv({ allErrors: true });
 
   const transformResource: ResourceService['transformResource'] = async (
     resource,
@@ -67,6 +70,19 @@ const resourceService: FastifyPluginAsync = async (fastify) => {
   };
 
   const createResource: ResourceService['createResource'] = async (data) => {
+    const collection = await fastify.database.collection.findUniqueOrThrow({
+      where: { id: data.collectionId },
+    });
+
+    if (collection.schema) {
+      const validate = ajv.compile(collection.schema);
+      const isValidPayload = validate(data.payload);
+
+      if (!isValidPayload) {
+        throw validate.errors;
+      }
+    }
+
     const createdResource = await fastify.database.resource.create({
       data: data,
     });

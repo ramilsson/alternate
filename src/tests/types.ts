@@ -1,5 +1,5 @@
 import type { FastifyInstance } from 'fastify';
-import type { Collection, Project, Resource } from '@prisma/client';
+import type { Collection, Prisma, Project, Resource } from '@prisma/client';
 import type { Client as MinioClient } from 'minio';
 import type { Object } from '../database/types.js';
 
@@ -19,9 +19,12 @@ export interface Fixtures {
   collectionFactory: {
     /**
      * Creates and returns a new collection
+     * @param data - Collection data, defaults to fixture data
      * @returns The created collection
      */
-    createCollection: () => Promise<Collection>;
+    createCollection: (
+      data?: Prisma.CollectionCreateInput,
+    ) => Promise<Collection>;
   };
 
   oneResource: Resource;

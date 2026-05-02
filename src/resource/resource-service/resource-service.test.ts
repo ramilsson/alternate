@@ -3,7 +3,7 @@ import { describe, expect } from 'vitest';
 import resourceService from './resource-service.js';
 import { ResourceService } from './types.js';
 import { test as testBase } from '../../tests/index.js';
-import { inspect } from 'node:util';
+import { faker } from '@faker-js/faker';
 
 interface Fixtures {
   resourceService: ResourceService;
@@ -92,8 +92,6 @@ describe('Resource service', () => {
       include: { objects: true },
     });
 
-    console.log(inspect(resources, true, 8));
-
     // Check if resources have objects array:
     const hasObjectsArray = resources.every((r) => Array.isArray(r.objects));
 
@@ -104,5 +102,51 @@ describe('Resource service', () => {
 
     expect(object).toBeDefined();
     expect(object).toHaveProperty('url');
+  });
+
+  describe('Resource validation against schema', () => {
+    test('Resource validation against schema', async ({
+      collectionFactory,
+      oneProject,
+      resourceService,
+    }) => {
+      const JSON_SCHEMA = {
+        $schema: 'http://json-schema.org/draft-07/schema#',
+        type: 'object',
+        properties: {
+          name: { type: 'string' },
+          age: { type: 'integer', minimum: 18 },
+          email: { type: 'string' },
+        },
+        required: ['name', 'age', 'email'],
+      };
+
+      const RESOURCE_INVALID_PAYLOAD = { name: 123, age: 16, email: 'email' };
+      const RESOURCE_VALID_PAYLOAD = {
+        name: 'John',
+        age: 30,
+        email: faker.internet.email(),
+      };
+
+      const collectionWithSchema = await collectionFactory.createCollection({
+        project: { connect: { id: oneProject.id } },
+        name: 'Collection with schema',
+        schema: JSON_SCHEMA,
+      });
+
+      await expect(
+        resourceService.createResource({
+          collectionId: collectionWithSchema.id,
+          payload: RESOURCE_INVALID_PAYLOAD,
+        }),
+      ).rejects.toThrow();
+
+      await expect(
+        resourceService.createResource({
+          collectionId: collectionWithSchema.id,
+          payload: RESOURCE_VALID_PAYLOAD,
+        }),
+      ).resolves.toMatchObject({ payload: RESOURCE_VALID_PAYLOAD });
+    });
   });
 });
