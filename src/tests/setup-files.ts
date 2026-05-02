@@ -8,6 +8,8 @@ afterEach(async () => {
   await server.database.collection.deleteMany();
   await server.database.resource.deleteMany();
   await server.database.object.deleteMany();
+
+  await server.database.user.deleteMany();
 });
 
 afterAll(async () => {

@@ -42,7 +42,7 @@ describe('Collection reading', () => {
 
     // Ensure that there are more collections in database...
     expect(totalCollectionsCount).toBeGreaterThan(
-      projectWithCollections.collections.length
+      projectWithCollections.collections.length,
     );
     // ...but we get only the collections of given one project in response
     expect(parsedBody).toEqual(projectWithCollections.collections);
@@ -111,7 +111,7 @@ describe('Collection creation', () => {
 
     expect(response.statusCode).toBe(201);
     expect(collectionsCount).toBe(1);
-    expect(parsedBody).toEqual({
+    expect(parsedBody).toMatchObject({
       id: parsedBody.id,
       name: COLLECTION_NAME,
       projectId: oneProject.id,
@@ -141,5 +141,56 @@ describe('Collection creation', () => {
     expect(response.statusCode).toBe(201);
     expect(response2.statusCode).toBe(201);
     expect(firstCollection.name).toEqual(secondCollection.name);
+  });
+
+  describe('Collection schema', () => {
+    const JSON_SCHEMA = {
+      $schema: 'http://json-schema.org/draft-07/schema#',
+      type: 'object',
+      properties: {
+        name: { type: 'string' },
+        age: { type: 'integer', minimum: 18 },
+        email: { type: 'string', format: 'email' },
+      },
+      required: ['name', 'age', 'email'],
+    };
+
+    test('Collection has correct schema property', async ({
+      collectionFactory,
+      oneProject,
+    }) => {
+      const collectionWithoutSchema = await collectionFactory.createCollection({
+        name: 'Collection without schema',
+        project: { connect: { id: oneProject.id } },
+      });
+
+      const collectionWithSchema = await collectionFactory.createCollection({
+        name: 'Collection with schema',
+        project: { connect: { id: oneProject.id } },
+        schema: JSON_SCHEMA,
+      });
+
+      expect(collectionWithoutSchema.schema).toBe(null);
+      expect(collectionWithSchema.schema).toEqual(JSON_SCHEMA);
+    });
+
+    test('Can create/update schema of collection', async ({
+      server,
+      collectionFactory,
+    }) => {
+      const collection = await collectionFactory.createCollection();
+
+      expect(collection.schema).toBe(null);
+
+      const collectionUpdateResponse = await server.inject({
+        method: 'patch',
+        url: `/collection/${collection.id}`,
+        payload: { schema: JSON_SCHEMA },
+      });
+
+      const updatedCollection = collectionUpdateResponse.json();
+
+      expect(updatedCollection.schema).toEqual(JSON_SCHEMA);
+    });
   });
 });

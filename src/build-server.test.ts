@@ -16,7 +16,7 @@ describe('Build server', () => {
       response.headers['access-control-allow-credentials'];
     const allowedMethods = response.headers['access-control-allow-methods'];
 
-    expect(allowCredentials).toBe(undefined);
+    expect(allowCredentials).toBe("true");
 
     expect(allowedMethods).toContain('GET');
     expect(allowedMethods).toContain('HEAD');

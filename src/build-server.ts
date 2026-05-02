@@ -1,6 +1,7 @@
 import Fastify, { fastify, type FastifyServerOptions } from 'fastify';
 import cors from '@fastify/cors';
 import database from './database/index.js';
+import authPlugin from './auth.js';
 import { minio } from './minio/index.js';
 import { project } from './project/index.js';
 import { collection } from './collection/index.js';
@@ -25,11 +26,15 @@ export const buildServer = (options: Options) => {
   const fastifyServer = Fastify(serverOptions);
 
   fastifyServer.register(cors, {
-    origin: true,
+    origin: process.env.CORS_ALLOWED_ORIGINS?.split(',') || false,
     methods: 'GET,HEAD,POST,PATCH,PUT,DELETE',
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    credentials: true,
+    maxAge: 86400,
   });
 
   fastifyServer.register(database);
+  fastifyServer.register(authPlugin);
   fastifyServer.register(minio, minioOptions);
 
   fastifyServer.register(project);

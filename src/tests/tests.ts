@@ -91,11 +91,15 @@ export const test = testBase.extend<Fixtures>({
   },
 
   collectionFactory: async ({ server, oneProject }, use) => {
-    const createCollection = async () => {
-      return await server.database.collection.create({
-        data: { name: faker.string.alpha(8), projectId: oneProject.id },
-      });
-    };
+    const createCollection: Fixtures['collectionFactory']['createCollection'] =
+      async (data) => {
+        return await server.database.collection.create({
+          data: data || {
+            name: faker.string.alpha(8),
+            projectId: oneProject.id,
+          },
+        });
+      };
 
     await use({ createCollection });
   },

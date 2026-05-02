@@ -1,9 +1,30 @@
-import { collectionListReadSchema, collectionCreateSchema } from './schema.js';
+import {
+  collectionReadSchema,
+  collectionListReadSchema,
+  collectionCreateSchema,
+  collectionUpdateSchema,
+} from './schema.js';
 
 import type { FastifyPluginAsync } from 'fastify';
-import type { CollectionListReadSchema, CollectionCreateSchema } from './types.js';
+import type {
+  CollectionReadSchema,
+  CollectionListReadSchema,
+  CollectionCreateSchema,
+  CollectionUpdateSchema,
+} from './types.js';
 
 export const collectionController: FastifyPluginAsync = async (fastify) => {
+  fastify.route<CollectionReadSchema>({
+    url: '/collection/:id',
+    method: 'GET',
+    schema: collectionReadSchema,
+    handler: async (request) => {
+      return await fastify.database.collection.findUniqueOrThrow({
+        where: { id: request.params.id },
+      });
+    },
+  });
+
   fastify.route<CollectionListReadSchema>({
     url: '/collection',
     method: 'GET',
@@ -25,6 +46,20 @@ export const collectionController: FastifyPluginAsync = async (fastify) => {
       });
 
       return reply.code(201).send(createdCollection);
+    },
+  });
+
+  fastify.route<CollectionUpdateSchema>({
+    method: 'PATCH',
+    url: '/collection/:id',
+    schema: collectionUpdateSchema,
+    handler: async (request, reply) => {
+      const updatedCollection = await fastify.database.collection.update({
+        where: { id: request.params.id },
+        data: { name: request.body.name, schema: request.body.schema },
+      });
+
+      return reply.code(200).send(updatedCollection);
     },
   });
 };
