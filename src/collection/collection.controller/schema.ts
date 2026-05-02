@@ -25,6 +25,7 @@ export const collectionUpdateSchema = {
   }),
   body: T.Object(
     {
+      name: T.Optional(T.String({ minLength: 1 })),
       schema: T.Optional(T.Object({})),
     },
     { additionalProperties: false },

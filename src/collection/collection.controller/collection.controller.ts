@@ -56,7 +56,7 @@ export const collectionController: FastifyPluginAsync = async (fastify) => {
     handler: async (request, reply) => {
       const updatedCollection = await fastify.database.collection.update({
         where: { id: request.params.id },
-        data: { schema: request.body.schema },
+        data: { name: request.body.name, schema: request.body.schema },
       });
 
       return reply.code(200).send(updatedCollection);
