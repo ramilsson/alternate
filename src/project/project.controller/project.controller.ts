@@ -1,8 +1,8 @@
 import { Prisma } from '@prisma/client';
-import { projectCreateSchema } from './schema.js';
+import { projectCreateSchema, projectReadSchema } from './schema.js';
 
 import type { FastifyPluginAsync } from 'fastify';
-import type { ProjectCreateSchema } from './types.js';
+import type { ProjectCreateSchema, ProjectReadSchema } from './types.js';
 
 export const projectController: FastifyPluginAsync = async (fastify) => {
   fastify.setErrorHandler((error, request, reply) => {
@@ -20,6 +20,17 @@ export const projectController: FastifyPluginAsync = async (fastify) => {
     }
 
     throw error;
+  });
+
+  fastify.route<ProjectReadSchema>({
+    url: '/project/:id',
+    method: 'GET',
+    schema: projectReadSchema,
+    handler: async (request) => {
+      return await fastify.database.project.findUniqueOrThrow({
+        where: { id: request.params.id },
+      });
+    },
   });
 
   fastify.route({

@@ -1,9 +1,28 @@
-import { collectionListReadSchema, collectionCreateSchema } from './schema.js';
+import {
+  collectionReadSchema,
+  collectionListReadSchema,
+  collectionCreateSchema,
+} from './schema.js';
 
 import type { FastifyPluginAsync } from 'fastify';
-import type { CollectionListReadSchema, CollectionCreateSchema } from './types.js';
+import type {
+  CollectionReadSchema,
+  CollectionListReadSchema,
+  CollectionCreateSchema,
+} from './types.js';
 
 export const collectionController: FastifyPluginAsync = async (fastify) => {
+  fastify.route<CollectionReadSchema>({
+    url: '/collection/:id',
+    method: 'GET',
+    schema: collectionReadSchema,
+    handler: async (request) => {
+      return await fastify.database.collection.findUniqueOrThrow({
+        where: { id: request.params.id },
+      });
+    },
+  });
+
   fastify.route<CollectionListReadSchema>({
     url: '/collection',
     method: 'GET',

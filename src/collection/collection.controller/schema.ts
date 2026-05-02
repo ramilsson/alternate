@@ -6,6 +6,12 @@ export const collectionListReadSchema = {
   }),
 };
 
+export const collectionReadSchema = {
+  params: T.Object({
+    id: T.String({ minLength: 1 }),
+  }),
+};
+
 export const collectionCreateSchema = {
   body: T.Object({
     projectId: T.String({ minLength: 1 }),
