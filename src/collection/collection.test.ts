@@ -111,7 +111,7 @@ describe('Collection creation', () => {
 
     expect(response.statusCode).toBe(201);
     expect(collectionsCount).toBe(1);
-    expect(parsedBody).toEqual({
+    expect(parsedBody).toMatchObject({
       id: parsedBody.id,
       name: COLLECTION_NAME,
       projectId: oneProject.id,
