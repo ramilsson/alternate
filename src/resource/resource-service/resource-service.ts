@@ -2,6 +2,7 @@ import { type FastifyPluginAsync } from 'fastify';
 import { fastifyPlugin } from 'fastify-plugin';
 import { validate as validateGuid } from 'uuid';
 import { Ajv } from 'ajv';
+import addFormats from 'ajv-formats';
 
 import type { Resource, ResourceService } from './types.js';
 import { objectService } from '../../storage/object-service/index.js';
@@ -9,7 +10,9 @@ import { objectService } from '../../storage/object-service/index.js';
 const resourceService: FastifyPluginAsync = async (fastify) => {
   fastify.register(objectService);
 
-  const ajv = new Ajv({ allErrors: true });
+  const ajv = new Ajv();
+
+  addFormats.default(ajv);
 
   const transformResource: ResourceService['transformResource'] = async (
     resource,
