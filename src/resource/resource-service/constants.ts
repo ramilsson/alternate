@@ -1,6 +1,8 @@
 import type { Options as AjvOptions } from 'ajv';
 import { validate } from 'uuid';
 
+export const RESOURCE_RELATIONS_DEPTH = 1;
+
 export const AJV_OPTIONS: AjvOptions = {
   /**
    * @see https://ajv.js.org/keywords

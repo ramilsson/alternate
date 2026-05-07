@@ -3,17 +3,35 @@ import addFormats from 'ajv-formats';
 import type { FastifyPluginAsync } from 'fastify';
 import { fastifyPlugin } from 'fastify-plugin';
 import { validate as validateGuid } from 'uuid';
-import type { Resource as DatabaseResource } from '../../database/types.js';
+import type {
+  Resource as DatabaseResource,
+  ResourceWithOutgoingRelations as DatabaseResourceWithOutgoingRelations,
+} from '../../database/types.js';
 import { objectService } from '../../storage/object-service/index.js';
 
 import { AJV_OPTIONS } from './constants.js';
 import type { Resource, ResourceService } from './types.js';
+import { getResourceOutgoingRelationsArgs } from './utils/index.js';
 
 const resourceService: FastifyPluginAsync = async (fastify) => {
   fastify.register(objectService);
 
   const ajv = new Ajv(AJV_OPTIONS);
   addFormats.default(ajv);
+
+  const transformRelations = async (resource: DatabaseResource | DatabaseResourceWithOutgoingRelations) => {
+    if (!('outgoingRelations' in resource)) return undefined;
+
+    const relationsObject: Resource['relations'] = {};
+
+    for (const relation of resource.outgoingRelations) {
+      relationsObject[relation.name] = relation.targetResource
+        ? await transformResource({ resource: relation.targetResource })
+        : null;
+    }
+
+    return relationsObject;
+  };
 
   const transformResource: ResourceService['transformResource'] = async (params) => {
     const resource = params.resource;
@@ -26,16 +44,7 @@ const resourceService: FastifyPluginAsync = async (fastify) => {
       return undefined;
     })();
 
-    const relations = (() => {
-      if ('outgoingRelations' in resource) {
-        return resource.outgoingRelations.reduce<NonNullable<Resource['relations']>>((acc, relation) => {
-          acc[relation.name] = relation.targetResource;
-          return acc;
-        }, {});
-      }
-
-      return undefined;
-    })();
+    const relations = await transformRelations(resource);
 
     const outgoingRelations = undefined;
 
@@ -47,12 +56,7 @@ const resourceService: FastifyPluginAsync = async (fastify) => {
       where: { id: params.resourceId },
       include: {
         objects: params.include?.objects,
-        outgoingRelations: params.relations
-          ? {
-              include: { targetResource: true },
-              where: { name: { in: params.relations } },
-            }
-          : false,
+        outgoingRelations: params.relations ? getResourceOutgoingRelationsArgs(params.relations) : false,
       },
     });
 
@@ -87,12 +91,7 @@ const resourceService: FastifyPluginAsync = async (fastify) => {
       populate: params.populate,
       include: {
         objects: params.include?.objects,
-        outgoingRelations: params.relations?.length
-          ? {
-              include: { targetResource: true },
-              where: { name: { in: params.relations } },
-            }
-          : false,
+        outgoingRelations: params.relations ? getResourceOutgoingRelationsArgs(params.relations) : false,
       },
     });
 

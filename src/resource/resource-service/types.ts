@@ -33,5 +33,5 @@ export interface ResourceService {
 
 export interface Resource extends DatabaseResource {
   objects?: Object[];
-  relations?: Record<keyof Resource['payload'], DatabaseResource | null>;
+  relations?: Record<keyof Resource['payload'], Resource | null>;
 }

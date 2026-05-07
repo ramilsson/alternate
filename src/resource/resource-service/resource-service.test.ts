@@ -152,6 +152,16 @@ describe('Resource service', () => {
         const authorsCollection = await collectionFactory.createCollection({
           name: 'Authors',
           project: { connect: { id: oneProject.id } },
+          schema: {
+            $schema: 'http://json-schema.org/draft-07/schema#',
+            type: 'object',
+            required: ['name', 'email', 'department'],
+            properties: {
+              name: { type: 'string' },
+              email: { type: 'string', format: 'email' },
+              department: { type: 'string' },
+            },
+          },
         });
 
         await use(authorsCollection);
@@ -318,6 +328,60 @@ describe('Resource service', () => {
         // Verify the new relation was added and populated correctly
         expect(updatedResource.relations).toHaveProperty('translation');
         expect(updatedResource.relations?.translation).toMatchObject(translationResource);
+      },
+    );
+
+    relationsTest(
+      'Read resource with nested relation two levels deep',
+      async ({ resourceService, authorsCollection, booksCollection, resourceFactory, oneCollection, server }) => {
+        // Create a department resource that will be referenced as a nested relation
+        const departmentResource = await resourceFactory.createResource(oneCollection, { name: 'Test department' });
+
+        // Update the Authors collection schema to change the 'department' field from string to resource relation
+        // This enables linking authors to department resources instead of just storing department names
+        await server.database.collection.update({
+          where: { id: authorsCollection.id },
+          data: {
+            schema: {
+              ...authorsCollection.schema,
+              properties: {
+                ...authorsCollection.schema.properties,
+                department: { type: 'string', 'x-type': 'resource' },
+              },
+            },
+          },
+        });
+
+        // Create an author resource that references the department by ID (nested relation)
+        const authorResource = await resourceService.createResource({
+          collectionId: authorsCollection.id,
+          payload: {
+            name: 'Test author',
+            email: 'test@example.com',
+            department: departmentResource.id,
+          },
+        });
+
+        // Create a book resource that references the author (first-level relation)
+        const bookResource = await resourceService.createResource({
+          collectionId: booksCollection.id,
+          payload: {
+            title: 'Test title',
+            description: 'Test description',
+            author: authorResource.id,
+          },
+        });
+
+        // Read the book and request both immediate relation (author) and nested relation (author.department)
+        // The 'relations' parameter supports dot notation to request nested relations
+        const resource = await resourceService.readResource({
+          resourceId: bookResource.id,
+          relations: ['author', 'department'], // 'department' here refers to author.department
+        });
+
+        // Verify that the nested department relation is populated under author.relations
+        expect(resource.relations?.author?.relations).toHaveProperty('department');
+        expect(resource.relations?.author?.relations?.department).toMatchObject(departmentResource);
       },
     );
   });
