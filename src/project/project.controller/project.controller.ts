@@ -1,7 +1,6 @@
 import { Prisma } from '@prisma/client';
-import { projectCreateSchema, projectReadSchema } from './schema.js';
-
 import type { FastifyPluginAsync } from 'fastify';
+import { projectCreateSchema, projectReadSchema } from './schema.js';
 import type { ProjectCreateSchema, ProjectReadSchema } from './types.js';
 
 export const projectController: FastifyPluginAsync = async (fastify) => {
@@ -13,8 +12,7 @@ export const projectController: FastifyPluginAsync = async (fastify) => {
     };
 
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      const statusCode =
-        statusCodeByPrismaErrorCode[error.code] || DEFAULT_STATUS_CODE;
+      const statusCode = statusCodeByPrismaErrorCode[error.code] || DEFAULT_STATUS_CODE;
 
       return reply.code(statusCode).send(error.message);
     }

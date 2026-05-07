@@ -1,16 +1,16 @@
-import { promisify } from 'node:util';
 import { exec } from 'node:child_process';
+import { promisify } from 'node:util';
 import { PostgreSqlContainer } from '@testcontainers/postgresql';
 
 async function runMigrations() {
   const command = `prisma db push --skip-generate`;
   const promisifiedExec = promisify(exec);
   const result = await promisifiedExec(command);
-  console.log(result.stdout);
+  console.info(result.stdout);
 }
 
 export default async function setup() {
-  console.log('Database setup...');
+  console.info('Database setup...');
 
   const container = await new PostgreSqlContainer(process.env.DATABASE_IMAGE)
     .withDatabase(String(process.env.DATABASE_NAME))
@@ -22,17 +22,17 @@ export default async function setup() {
     })
     .start();
 
-  console.log('Database container started');
+  console.info('Database container started');
 
-  console.log('Run migrations...');
+  console.info('Run migrations...');
 
   await runMigrations();
 
   return async function teardown() {
-    console.log('Database teardown...');
+    console.info('Database teardown...');
 
     await container.stop();
 
-    console.log('Database container stopped');
+    console.info('Database container stopped');
   };
 }

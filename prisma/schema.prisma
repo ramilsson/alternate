@@ -36,14 +36,29 @@ model Collection {
 }
 
 model Resource {
-  id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  collectionId String     @db.Uuid
+  id                String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  collection        Collection         @relation(fields: [collectionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  collectionId      String             @db.Uuid
   /// [ResourcePayload]
-  payload      Json       @default("{}")
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime?  @updatedAt
-  objects      Object[]
+  payload           Json               @default("{}")
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime?          @updatedAt
+  objects           Object[]
+  outgoingRelations ResourceRelation[] @relation("Resource")
+  incomingRelations ResourceRelation[] @relation("TargetResource")
+}
+
+model ResourceRelation {
+  id   String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name String @db.VarChar(64)
+
+  resource   Resource? @relation("Resource", fields: [resourceId], references: [id])
+  resourceId String?   @db.Uuid
+
+  targetResource   Resource? @relation("TargetResource", fields: [targetResourceId], references: [id])
+  targetResourceId String?   @db.Uuid
+
+  @@unique([resourceId, targetResourceId])
 }
 
 model Object {

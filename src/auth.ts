@@ -1,9 +1,8 @@
-import { FastifyPluginAsync } from 'fastify';
-import fastifyPlugin from 'fastify-plugin';
-
 import { betterAuth } from 'better-auth';
-import { fromNodeHeaders } from 'better-auth/node';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
+import { fromNodeHeaders } from 'better-auth/node';
+import type { FastifyPluginAsync } from 'fastify';
+import fastifyPlugin from 'fastify-plugin';
 
 const authPlugin: FastifyPluginAsync = async (fastify) => {
   const auth = betterAuth({
@@ -37,7 +36,9 @@ const authPlugin: FastifyPluginAsync = async (fastify) => {
         const response = await auth.handler(req);
         // Forward response to client
         reply.status(response.status);
-        response.headers.forEach((value, key) => reply.header(key, value));
+        response.headers.forEach((value, key) => {
+          reply.header(key, value);
+        });
         return reply.send(response.body ? await response.text() : null);
       } catch (error) {
         fastify.log.error('Authentication Error:', error);

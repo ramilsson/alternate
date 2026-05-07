@@ -1,9 +1,9 @@
-import { type FastifyPluginAsync } from 'fastify';
+import type { FastifyPluginAsync } from 'fastify';
 import { fastifyPlugin } from 'fastify-plugin';
 import mime from 'mime';
 
-import { Object as DatabaseObject } from '../../database/types.js';
-import { Object, ObjectService } from './types.js';
+import type { Object as DatabaseObject } from '../../database/types.js';
+import type { Object, ObjectService } from './types.js';
 
 const objectService: FastifyPluginAsync = async (fastify) => {
   const { client: minioClient, bucketName } = fastify.minio;
@@ -32,9 +32,7 @@ const objectService: FastifyPluginAsync = async (fastify) => {
     return { ...object, url, postPolicy };
   };
 
-  const readObjectList: ObjectService['readObjectList'] = async (
-    resourceId,
-  ) => {
+  const readObjectList: ObjectService['readObjectList'] = async (resourceId) => {
     const objects = await fastify.database.object.findMany({
       where: { resourceId },
     });

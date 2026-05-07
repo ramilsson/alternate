@@ -1,10 +1,10 @@
-import Fastify, { fastify, type FastifyServerOptions } from 'fastify';
 import cors from '@fastify/cors';
-import database from './database/index.js';
+import Fastify, { type FastifyServerOptions } from 'fastify';
 import authPlugin from './auth.js';
+import { collection } from './collection/index.js';
+import database from './database/index.js';
 import { minio } from './minio/index.js';
 import { project } from './project/index.js';
-import { collection } from './collection/index.js';
 import { resource } from './resource/index.js';
 import { storage } from './storage/index.js';
 

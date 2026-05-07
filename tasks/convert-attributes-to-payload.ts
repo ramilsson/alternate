@@ -17,33 +17,30 @@ async function main() {
 
   await prisma.$transaction(
     resources.map((resource) => {
-      const payload = resource.attributes.reduce<Record<string, unknown>>(
-        (acc, attribute) => {
-          const value = (() => {
-            if (!attribute.value) {
-              return null;
-            } else if (attribute.type === 'LITERAL_NUMBER') {
-              return Number(attribute.value);
-            } else if (attribute.type === 'LITERAL_BOOLEAN') {
-              return Boolean(Number(attribute.value));
-            } else if (attribute.type === 'LITERAL_JSON') {
-              return JSON.parse(attribute.value);
-            } else {
-              return String(attribute.value);
-            }
-          })();
+      const payload = resource.attributes.reduce<Record<string, unknown>>((acc, attribute) => {
+        const value = (() => {
+          if (!attribute.value) {
+            return null;
+          } else if (attribute.type === 'LITERAL_NUMBER') {
+            return Number(attribute.value);
+          } else if (attribute.type === 'LITERAL_BOOLEAN') {
+            return Boolean(Number(attribute.value));
+          } else if (attribute.type === 'LITERAL_JSON') {
+            return JSON.parse(attribute.value);
+          } else {
+            return String(attribute.value);
+          }
+        })();
 
-          acc[attribute.name] = value;
-          return acc;
-        },
-        {}
-      );
+        acc[attribute.name] = value;
+        return acc;
+      }, {});
 
       return prisma.resource.update({
         where: { id: resource.id },
         data: { payload: payload },
       });
-    })
+    }),
   );
 }
 

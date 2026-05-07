@@ -1,12 +1,12 @@
-import type { TestProject } from 'vitest/node';
 import { GenericContainer, Network } from 'testcontainers';
+import type { TestProject } from 'vitest/node';
 
 export default async function setup({ provide }: TestProject) {
-  console.log('Minio setup...');
+  console.info('Minio setup...');
 
   const network = await new Network().start();
 
-  console.log('Minio network started');
+  console.info('Minio network started');
 
   const MINIO_PORT = 9000;
   const MINIO_UI_PORT = 9001;
@@ -26,7 +26,7 @@ export default async function setup({ provide }: TestProject) {
     .withEnvironment({ MINIO_ROOT_USER, MINIO_ROOT_PASSWORD })
     .start();
 
-  console.log('Minio container started');
+  console.info('Minio container started');
 
   const minioHost = minioContainer.getHost();
   const minioPort = minioContainer.getMappedPort(MINIO_PORT);
@@ -47,10 +47,10 @@ export default async function setup({ provide }: TestProject) {
     .start();
 
   return async function teardown() {
-    console.log('Minio teardown...');
+    console.info('Minio teardown...');
 
     await minioContainer.stop();
 
-    console.log('Minio container stopped');
+    console.info('Minio container stopped');
   };
 }

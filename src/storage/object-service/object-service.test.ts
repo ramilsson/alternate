@@ -1,6 +1,6 @@
 import { describe, expect } from 'vitest';
 
-import { ObjectService } from './types.js';
+import type { ObjectService } from './types.js';
 import objectService from './object-service.js';
 import { test as testBase } from '../../tests/index.js';
 
@@ -19,10 +19,7 @@ const test = testBase.extend<Fixtures>({
 });
 
 describe('Object service', () => {
-  test('Object has correct url property', async ({
-    objectService,
-    oneObject,
-  }) => {
+  test('Object has correct url property', async ({ objectService, oneObject }) => {
     const objects = await objectService.readObjectList(oneObject.resourceId);
     const object = objects.at(0);
 

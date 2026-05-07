@@ -1,4 +1,4 @@
-import { PrismaClientExtended } from './types.js';
+import type { PrismaClientExtended } from './types.js';
 
 declare module 'fastify' {
   interface FastifyInstance {

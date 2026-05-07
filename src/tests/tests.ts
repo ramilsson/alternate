@@ -5,10 +5,10 @@
  * @see https://vitest.dev/guide/improving-performance
  */
 
-import type { FastifyInstance } from 'fastify';
-import { inject, test as testBase } from 'vitest';
-import { Client as MinioClient } from 'minio';
 import { faker } from '@faker-js/faker';
+import type { FastifyInstance } from 'fastify';
+import { Client as MinioClient } from 'minio';
+import { inject, test as testBase } from 'vitest';
 
 import { buildServer } from '../build-server.js';
 import type { Fixtures } from './types.js';
@@ -91,15 +91,14 @@ export const test = testBase.extend<Fixtures>({
   },
 
   collectionFactory: async ({ server, oneProject }, use) => {
-    const createCollection: Fixtures['collectionFactory']['createCollection'] =
-      async (data) => {
-        return await server.database.collection.create({
-          data: data || {
-            name: faker.string.alpha(8),
-            projectId: oneProject.id,
-          },
-        });
-      };
+    const createCollection: Fixtures['collectionFactory']['createCollection'] = async (data) => {
+      return await server.database.collection.create({
+        data: data || {
+          name: faker.string.alpha(8),
+          projectId: oneProject.id,
+        },
+      });
+    };
 
     await use({ createCollection });
   },
@@ -141,12 +140,12 @@ export const test = testBase.extend<Fixtures>({
     await server.database.resource.deleteMany();
   },
 
-  resourceFactory: async ({ server, oneCollection }, use) => {
-    const createResource = async (collection = oneCollection) => {
+  resourceFactory: async ({ server }, use) => {
+    const createResource: Fixtures['resourceFactory']['createResource'] = async (collection, payload) => {
       return await server.database.resource.create({
         data: {
           collectionId: collection.id,
-          payload: {
+          payload: payload || {
             propertyString: 'string',
             propertyNumber: 1,
             propertyBoolean: true,

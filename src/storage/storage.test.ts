@@ -24,11 +24,7 @@ describe('Storage', () => {
     });
   });
 
-  test('Create and return object with presigned POST policy', async ({
-    server,
-    oneResource,
-    oneFile,
-  }) => {
+  test('Create and return object with presigned POST policy', async ({ server, oneResource, oneFile }) => {
     const response = await server.inject({
       method: 'POST',
       url: '/object',
@@ -51,11 +47,7 @@ describe('Storage', () => {
     expect(object.postPolicy).toHaveProperty('formData');
   });
 
-  test('Upload file using presigned POST policy', async ({
-    server,
-    oneResource,
-    oneFile,
-  }) => {
+  test('Upload file using presigned POST policy', async ({ server, oneResource, oneFile }) => {
     const objectCreateResponse = await server.inject({
       method: 'POST',
       url: '/object',

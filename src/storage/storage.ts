@@ -1,14 +1,14 @@
-import { type FastifyPluginAsync } from 'fastify';
+import type { FastifyPluginAsync } from 'fastify';
 
 import { objectService } from './object-service/index.js';
 
 import {
   objectCreateSchema,
-  ObjectCreateSchema,
+  type ObjectCreateSchema,
   objectListReadSchema,
-  ObjectListReadSchema,
+  type ObjectListReadSchema,
   objectUpdateSchema,
-  ObjectUpdateSchema,
+  type ObjectUpdateSchema,
 } from './schema.js';
 
 export const storage: FastifyPluginAsync = async (fastify) => {
@@ -19,9 +19,7 @@ export const storage: FastifyPluginAsync = async (fastify) => {
     url: '/object',
     schema: objectListReadSchema,
     handler: async (request, reply) => {
-      return await fastify.objectService.readObjectList(
-        request.query.resourceId,
-      );
+      return await fastify.objectService.readObjectList(request.query.resourceId);
     },
   });
 
@@ -30,9 +28,7 @@ export const storage: FastifyPluginAsync = async (fastify) => {
     method: 'POST',
     schema: objectCreateSchema,
     handler: async (request, reply) => {
-      const createdObject = await fastify.objectService.createObject(
-        request.body,
-      );
+      const createdObject = await fastify.objectService.createObject(request.body);
 
       return reply.code(201).send(createdObject);
     },
@@ -43,10 +39,7 @@ export const storage: FastifyPluginAsync = async (fastify) => {
     method: 'PATCH',
     schema: objectUpdateSchema,
     handler: async (request) => {
-      return await fastify.objectService.updateObject(
-        request.params.id,
-        request.body,
-      );
+      return await fastify.objectService.updateObject(request.params.id, request.body);
     },
   });
 };

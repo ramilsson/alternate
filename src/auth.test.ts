@@ -1,6 +1,5 @@
 import { describe, expect } from 'vitest';
 import { test } from './tests';
-import { inspect } from 'node:util';
 
 describe('Authentication', () => {
   test('Sign up using email and password', async ({ server }) => {
@@ -24,10 +23,6 @@ describe('Authentication', () => {
       name: newUserData.name,
       email: newUserData.email,
     });
-
-    console.log(response.headers);
-
-    console.log(inspect(response.json(), true, 8));
   });
 
   test.todo('Sign in');

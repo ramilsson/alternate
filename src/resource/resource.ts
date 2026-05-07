@@ -1,4 +1,4 @@
-import { type FastifyPluginAsync } from 'fastify';
+import type { FastifyPluginAsync } from 'fastify';
 import { resourceService } from './resource-service/index.js';
 import { resourceController } from './resource-controller/index.js';
 
