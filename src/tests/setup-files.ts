@@ -1,4 +1,4 @@
-import { afterEach, afterAll } from 'vitest';
+import { afterAll, afterEach } from 'vitest';
 import { server } from './tests.js';
 
 afterEach(async () => {

@@ -3,9 +3,9 @@ import type { Static } from '@sinclair/typebox';
 import type { ResourceService } from '../resource-service/index.js';
 
 import type {
-  resourceReadSchema,
-  resourceListReadSchema,
   resourceCreateSchema,
+  resourceListReadSchema,
+  resourceReadSchema,
   resourceUpdateSchema,
 } from './schema.js';
 

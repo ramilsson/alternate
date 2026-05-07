@@ -1,6 +1,6 @@
-import { describe, expect } from 'vitest';
-import type { Resource } from '@prisma/client';
 import { faker } from '@faker-js/faker';
+import type { Resource } from '@prisma/client';
+import { describe, expect } from 'vitest';
 import { test } from '../tests';
 import { serializeResource } from '../tests/utils';
 

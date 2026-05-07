@@ -1,5 +1,5 @@
-import fastifyPlugin from 'fastify-plugin';
 import type { FastifyPluginAsync } from 'fastify';
+import fastifyPlugin from 'fastify-plugin';
 
 import { createExtendedPrismaClient } from './utils.js';
 

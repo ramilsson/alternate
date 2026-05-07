@@ -1,5 +1,5 @@
-import type { FastifyInstance } from 'fastify';
 import type { Collection, Prisma, Project, Resource } from '@prisma/client';
+import type { FastifyInstance } from 'fastify';
 import type { Client as MinioClient } from 'minio';
 import type { Object } from '../database/types.js';
 

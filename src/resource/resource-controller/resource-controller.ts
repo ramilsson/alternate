@@ -1,18 +1,15 @@
 import type { FastifyPluginAsync } from 'fastify';
 import qs from 'qs';
-
-import { resourceReadSchema, resourceListReadSchema, resourceCreateSchema, resourceUpdateSchema } from './schema.js';
-
-import type {
-  ResourceReadSchema,
-  ResourceListReadSchema,
-  ResourceCreateSchema,
-  ResourceUpdateSchema,
-  ResourceControllerOptions,
-} from './types.js';
-
-import { isValidResourceWhereInput } from './utils.js';
 import { INVALID_WHERE_PARAMETER_MESSAGE } from './const.js';
+import { resourceCreateSchema, resourceListReadSchema, resourceReadSchema, resourceUpdateSchema } from './schema.js';
+import type {
+  ResourceControllerOptions,
+  ResourceCreateSchema,
+  ResourceListReadSchema,
+  ResourceReadSchema,
+  ResourceUpdateSchema,
+} from './types.js';
+import { isValidResourceWhereInput } from './utils.js';
 
 export const resourceController: FastifyPluginAsync<ResourceControllerOptions> = async (fastify, options) => {
   const resourceService = options.resourceService;

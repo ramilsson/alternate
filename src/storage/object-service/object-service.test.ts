@@ -1,8 +1,7 @@
 import { describe, expect } from 'vitest';
-
-import type { ObjectService } from './types.js';
-import objectService from './object-service.js';
 import { test as testBase } from '../../tests/index.js';
+import objectService from './object-service.js';
+import type { ObjectService } from './types.js';
 
 interface Fixtures {
   objectService: ObjectService;

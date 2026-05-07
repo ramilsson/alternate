@@ -1,5 +1,5 @@
-import { describe, expect } from 'vitest';
 import type { PostPolicyResult } from 'minio';
+import { describe, expect } from 'vitest';
 
 import { test } from '../tests/index.js';
 import { ObjectStatus } from './types.js';

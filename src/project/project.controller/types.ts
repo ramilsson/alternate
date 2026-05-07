@@ -1,6 +1,5 @@
-import type { projectReadSchema, projectCreateSchema } from './schema.js';
-
 import type { Static } from '@sinclair/typebox';
+import type { projectCreateSchema, projectReadSchema } from './schema.js';
 
 export type ProjectReadSchema = {
   Params: Static<(typeof projectReadSchema)['params']>;

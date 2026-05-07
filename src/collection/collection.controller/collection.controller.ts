@@ -1,15 +1,14 @@
+import type { FastifyPluginAsync } from 'fastify';
 import {
-  collectionReadSchema,
-  collectionListReadSchema,
   collectionCreateSchema,
+  collectionListReadSchema,
+  collectionReadSchema,
   collectionUpdateSchema,
 } from './schema.js';
-
-import type { FastifyPluginAsync } from 'fastify';
 import type {
-  CollectionReadSchema,
-  CollectionListReadSchema,
   CollectionCreateSchema,
+  CollectionListReadSchema,
+  CollectionReadSchema,
   CollectionUpdateSchema,
 } from './types.js';
 

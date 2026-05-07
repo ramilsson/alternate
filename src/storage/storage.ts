@@ -3,12 +3,12 @@ import type { FastifyPluginAsync } from 'fastify';
 import { objectService } from './object-service/index.js';
 
 import {
-  objectCreateSchema,
   type ObjectCreateSchema,
-  objectListReadSchema,
   type ObjectListReadSchema,
-  objectUpdateSchema,
   type ObjectUpdateSchema,
+  objectCreateSchema,
+  objectListReadSchema,
+  objectUpdateSchema,
 } from './schema.js';
 
 export const storage: FastifyPluginAsync = async (fastify) => {

@@ -6,7 +6,7 @@
  * @file This file contains an one-off task that converts data of resource `fields` to `attributes`.
  */
 
-import { PrismaClient, type Prisma, AttributeType } from '@prisma/client';
+import { AttributeType, type Prisma, PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
