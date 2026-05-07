@@ -10,6 +10,7 @@ const authPlugin: FastifyPluginAsync = async (fastify) => {
     emailAndPassword: { enabled: true },
     trustedOrigins: process.env.BETTER_AUTH_TRUSTED_ORIGINS?.split(','),
     secret: process.env.BETTER_AUTH_SECRET,
+    baseURL: process.env.BETTER_AUTH_URL,
     basePath: '/auth',
   });
 
