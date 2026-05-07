@@ -1,8 +1,9 @@
 {
   "extends": "@tsconfig/node20/tsconfig.json",
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "prisma/index.ts"],
   "exclude": ["src/**/*.test.ts"],
   "compilerOptions": {
-    "outDir": "build"
+    "outDir": "build",
+    "rootDir": "."
   }
 }

@@ -6,7 +6,7 @@
   "module": "index.ts",
   "scripts": {
     "dev": "npx tsx watch src/index.ts",
-    "start": "node build/index.js",
+    "start": "node build/src/index.js",
     "build": "tsc -p tsconfig.json",
     "test": "dotenv -e .env.test -- vitest",
     "prisma:generate": "prisma generate",
