@@ -1,7 +1,8 @@
 #!/usr/bin/env -S npx tsx
 
 /**
- * @file This file contains an one-off task that converts resource `attributes` to `payload`.
+ * @file This file contains an one-off task that creates resource relation
+ * for each payload property with uuid value
  */
 
 import { PrismaClient } from '@prisma/client';
