@@ -37,7 +37,8 @@ export const resourceController: FastifyPluginAsync<
 
       return await resourceService.readResourceList({
         collectionId: request.query.collectionId,
-        populate: request.query.populate?.split(',') || [],
+        populate: request.query.populate?.split(','),
+        relations: request.query.relations?.split(','),
         where: parsedQuery.where,
         include: {
           objects: Boolean(request.query.include?.includes('objects')),
@@ -53,6 +54,7 @@ export const resourceController: FastifyPluginAsync<
     handler: async (request, reply) => {
       const resource = await resourceService.readResource({
         resourceId: request.params.id,
+        relations: request.query.relations?.split(','),
         include: {
           objects: Boolean(request.query.include?.includes('objects')),
         },

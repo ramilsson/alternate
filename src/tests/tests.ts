@@ -141,20 +141,21 @@ export const test = testBase.extend<Fixtures>({
     await server.database.resource.deleteMany();
   },
 
-  resourceFactory: async ({ server, oneCollection }, use) => {
-    const createResource = async (collection = oneCollection) => {
-      return await server.database.resource.create({
-        data: {
-          collectionId: collection.id,
-          payload: {
-            propertyString: 'string',
-            propertyNumber: 1,
-            propertyBoolean: true,
-            propertyObject: { foo: 'bar' },
+  resourceFactory: async ({ server }, use) => {
+    const createResource: Fixtures['resourceFactory']['createResource'] =
+      async (collection, payload) => {
+        return await server.database.resource.create({
+          data: {
+            collectionId: collection.id,
+            payload: payload || {
+              propertyString: 'string',
+              propertyNumber: 1,
+              propertyBoolean: true,
+              propertyObject: { foo: 'bar' },
+            },
           },
-        },
-      });
-    };
+        });
+      };
 
     await use({ createResource });
   },

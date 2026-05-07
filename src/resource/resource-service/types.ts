@@ -1,34 +1,47 @@
 import {
   Resource as DatabaseResource,
   ResourceWithObjects as DatabaseResourceWithObjects,
+  ResourceWithOutgoingRelations as DatabaseResourceWithOutgoingRelations,
   ResourceFindManyAndPopulateParams,
 } from '../../database/types.js';
 import type { Object } from '../../storage/object-service/types.js';
 
 export interface ResourceServiceOptions {}
 
-export interface ResourceService {
-  transformResource: (
-    resource: DatabaseResource | DatabaseResourceWithObjects,
-  ) => Promise<Resource>;
+interface ResourceReadParams {
+  resourceId: Resource['id'];
+  populate?: string[];
+  include?: { objects: boolean };
+  relations?: string[];
+}
 
-  readResource: (params: {
-    resourceId: Resource['id'];
-    populate?: string[];
-    include?: { objects: boolean };
-  }) => Promise<Resource>;
-  readResourceList: (
-    params: ResourceFindManyAndPopulateParams,
-  ) => Promise<Resource[]>;
+interface ResourceListReadParams extends ResourceFindManyAndPopulateParams {
+  include?: { objects: boolean };
+  relations?: string[];
+}
+
+export interface ResourceTransformParams {
+  resource:
+    | DatabaseResource
+    | DatabaseResourceWithObjects
+    | DatabaseResourceWithOutgoingRelations;
+}
+
+export interface ResourceService {
+  transformResource: (params: ResourceTransformParams) => Promise<Resource>;
+
+  readResource: (params: ResourceReadParams) => Promise<Resource>;
+  readResourceList: (params: ResourceListReadParams) => Promise<Resource[]>;
   createResource: (
     data: Pick<Resource, 'collectionId' | 'payload'>,
-  ) => Promise<Resource>;
+  ) => Promise<DatabaseResource>;
   updateResource: (
     resourceId: Resource['id'],
     data: Pick<Resource, 'payload'>,
-  ) => Promise<Resource>;
+  ) => Promise<DatabaseResource>;
 }
 
 export interface Resource extends DatabaseResource {
   objects?: Object[];
+  relations?: Record<keyof Resource['payload'], DatabaseResource | null>;
 }

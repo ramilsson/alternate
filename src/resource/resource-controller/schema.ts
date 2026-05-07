@@ -7,6 +7,7 @@ export const resourceReadSchema = {
   querystring: T.Object({
     populate: T.Optional(T.String({ minLength: 1 })),
     include: T.Optional(T.String({ minLength: 1 })),
+    relations: T.Optional(T.String({ minLength: 1 })),
   }),
 };
 
@@ -15,6 +16,7 @@ export const resourceListReadSchema = {
     collectionId: T.String({ minLength: 1 }),
     populate: T.Optional(T.String({ minLength: 1 })),
     include: T.Optional(T.String({ minLength: 1 })),
+    relations: T.Optional(T.String({ minLength: 1 })),
   }),
 };
 

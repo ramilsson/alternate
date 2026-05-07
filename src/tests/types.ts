@@ -33,9 +33,13 @@ export interface Fixtures {
     /**
      * Creates a new resource in the specified collection
      * @param collection - The collection to create the resource in
+     * @param payload - Resource payload. Defaults to fixture payload
      * @returns The created resource
      */
-    createResource: (collection: Collection) => Promise<Resource>;
+    createResource: (
+      collection: Collection,
+      payload?: Resource['payload'],
+    ) => Promise<Resource>;
   };
 
   minioClient: MinioClient;
