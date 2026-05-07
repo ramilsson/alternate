@@ -6,16 +6,14 @@
  * @file This file contains an one-off task that converts data of resource `fields` to `attributes`.
  */
 
-import { PrismaClient, Prisma, AttributeType } from '@prisma/client';
+import { PrismaClient, type Prisma, AttributeType } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 async function main() {
   const resources = await prisma.resource.findMany();
 
-  const attributesToCreate = resources.reduce<
-    Prisma.AttributeCreateManyInput[]
-  >((acc, resource) => {
+  const attributesToCreate = resources.reduce<Prisma.AttributeCreateManyInput[]>((acc, resource) => {
     const attributesToCreate = resource.fields.map((field) => {
       let attributeType: AttributeType = AttributeType.LITERAL_STRING;
 
@@ -27,10 +25,7 @@ async function main() {
         attributeType = AttributeType.LITERAL_JSON;
       }
 
-      const value =
-        attributeType === AttributeType.LITERAL_JSON
-          ? JSON.stringify(field.value)
-          : String(field.value);
+      const value = attributeType === AttributeType.LITERAL_JSON ? JSON.stringify(field.value) : String(field.value);
 
       return {
         resourceId: resource.id,

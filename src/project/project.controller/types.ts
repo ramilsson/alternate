@@ -1,4 +1,4 @@
-import { projectReadSchema, projectCreateSchema } from './schema.js';
+import type { projectReadSchema, projectCreateSchema } from './schema.js';
 
 import type { Static } from '@sinclair/typebox';
 

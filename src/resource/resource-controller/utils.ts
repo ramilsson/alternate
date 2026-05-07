@@ -1,4 +1,4 @@
-import { ResourceFindManyAndPopulateParams } from '../../database/types.js';
+import type { ResourceFindManyAndPopulateParams } from '../../database/types.js';
 
 type ResourceWhereInput = ResourceFindManyAndPopulateParams['where'];
 
@@ -10,9 +10,7 @@ type ResourceWhereInput = ResourceFindManyAndPopulateParams['where'];
  * @note This is currently a minimal implementation that only checks the value's type.
  * @todo Implement proper validation against the full `ResourceWhereInput` schema:
  */
-export function isValidResourceWhereInput(
-  where: unknown
-): where is ResourceWhereInput {
+export function isValidResourceWhereInput(where: unknown): where is ResourceWhereInput {
   if (where === undefined) return true;
 
   return typeof where === 'object' && where !== null;

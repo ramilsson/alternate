@@ -1,11 +1,10 @@
-import { type FastifyPluginAsync } from 'fastify';
-import { fastifyPlugin } from 'fastify-plugin';
-import { validate as validateGuid } from 'uuid';
 import { Ajv } from 'ajv';
 import addFormats from 'ajv-formats';
-
-import { objectService } from '../../storage/object-service/index.js';
+import type { FastifyPluginAsync } from 'fastify';
+import { fastifyPlugin } from 'fastify-plugin';
+import { validate as validateGuid } from 'uuid';
 import type { Resource as DatabaseResource } from '../../database/types.js';
+import { objectService } from '../../storage/object-service/index.js';
 
 import { AJV_OPTIONS } from './constants.js';
 import type { Resource, ResourceService } from './types.js';
@@ -16,16 +15,12 @@ const resourceService: FastifyPluginAsync = async (fastify) => {
   const ajv = new Ajv(AJV_OPTIONS);
   addFormats.default(ajv);
 
-  const transformResource: ResourceService['transformResource'] = async (
-    params,
-  ) => {
+  const transformResource: ResourceService['transformResource'] = async (params) => {
     const resource = params.resource;
 
     const objects = await (async () => {
       if ('objects' in resource) {
-        return await Promise.all(
-          resource.objects.map(fastify.objectService.transformObject),
-        );
+        return await Promise.all(resource.objects.map(fastify.objectService.transformObject));
       }
 
       return undefined;
@@ -33,9 +28,7 @@ const resourceService: FastifyPluginAsync = async (fastify) => {
 
     const relations = (() => {
       if ('outgoingRelations' in resource) {
-        return resource.outgoingRelations.reduce<
-          NonNullable<Resource['relations']>
-        >((acc, relation) => {
+        return resource.outgoingRelations.reduce<NonNullable<Resource['relations']>>((acc, relation) => {
           acc[relation.name] = relation.targetResource;
           return acc;
         }, {});
@@ -72,9 +65,7 @@ const resourceService: FastifyPluginAsync = async (fastify) => {
         where: { id: { in: resourceIdsToPopulate } },
       });
 
-      const resourcesMap = resources.reduce<
-        Record<DatabaseResource['id'], DatabaseResource>
-      >((acc, resource) => {
+      const resourcesMap = resources.reduce<Record<DatabaseResource['id'], DatabaseResource>>((acc, resource) => {
         acc[resource.id] = resource;
         return acc;
       }, {});
@@ -89,9 +80,7 @@ const resourceService: FastifyPluginAsync = async (fastify) => {
     return await transformResource({ resource });
   };
 
-  const readResourceList: ResourceService['readResourceList'] = async (
-    params,
-  ) => {
+  const readResourceList: ResourceService['readResourceList'] = async (params) => {
     const resources = await fastify.database.resource.findManyAndPopulate({
       collectionId: params.collectionId,
       where: params.where,
@@ -107,9 +96,7 @@ const resourceService: FastifyPluginAsync = async (fastify) => {
       },
     });
 
-    return await Promise.all(
-      resources.map((resource) => transformResource({ resource })),
-    );
+    return await Promise.all(resources.map((resource) => transformResource({ resource })));
   };
 
   const createResource: ResourceService['createResource'] = async (data) => {
@@ -149,10 +136,7 @@ const resourceService: FastifyPluginAsync = async (fastify) => {
     return createdResource;
   };
 
-  const updateResource: ResourceService['updateResource'] = async (
-    resourceId,
-    data,
-  ) => {
+  const updateResource: ResourceService['updateResource'] = async (resourceId, data) => {
     const resource = await fastify.database.resource.findUniqueOrThrow({
       where: { id: resourceId },
       include: { collection: true, outgoingRelations: true },
@@ -173,16 +157,11 @@ const resourceService: FastifyPluginAsync = async (fastify) => {
       ? Object.entries(collection.schema.properties)
           .filter(([property, propertySchema]) => {
             return (
-              propertySchema['x-type'] === 'resource' &&
-              !resource.outgoingRelations.find((r) => r.name === property)
+              propertySchema['x-type'] === 'resource' && !resource.outgoingRelations.find((r) => r.name === property)
             );
           })
           .map(([property]) => {
-            return {
-              name: property,
-              resourceId: resource.id,
-              targetResourceId: data.payload[property] as string,
-            };
+            return { name: property, resourceId: resource.id, targetResourceId: data.payload[property] as string };
           })
       : [];
 
@@ -191,17 +170,12 @@ const resourceService: FastifyPluginAsync = async (fastify) => {
     });
 
     const [updatedResource] = await fastify.database.$transaction([
-      fastify.database.resource.update({
-        where: { id: resourceId },
-        data: data,
-      }),
+      fastify.database.resource.update({ where: { id: resourceId }, data: data }),
       fastify.database.resourceRelation.createMany({ data: relationsToCreate }),
       ...relationsToUpdate.map((relation) =>
         fastify.database.resourceRelation.update({
           where: { id: relation.id },
-          data: {
-            targetResourceId: data.payload[relation.name] as Resource['id'],
-          },
+          data: { targetResourceId: data.payload[relation.name] as Resource['id'] },
         }),
       ),
     ]);

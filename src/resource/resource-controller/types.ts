@@ -1,8 +1,8 @@
 import type { Static } from '@sinclair/typebox';
 
-import { ResourceService } from '../resource-service/index.js';
+import type { ResourceService } from '../resource-service/index.js';
 
-import {
+import type {
   resourceReadSchema,
   resourceListReadSchema,
   resourceCreateSchema,

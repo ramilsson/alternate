@@ -4,9 +4,7 @@ import { test } from '../tests';
 const COLLECTION_NAME = 'test-collection-name';
 
 describe('Collection reading', () => {
-  test('Cannot read list of collections without projectId', async ({
-    server,
-  }) => {
+  test('Cannot read list of collections without projectId', async ({ server }) => {
     const response = await server.inject({
       url: '/collection',
       method: 'GET',
@@ -15,10 +13,7 @@ describe('Collection reading', () => {
     expect(response.statusCode).toBe(400);
   });
 
-  test('Can read list of collections of single project only', async ({
-    server,
-    manyCollections,
-  }) => {
+  test('Can read list of collections of single project only', async ({ server, manyCollections }) => {
     const projectWithCollections = await server.database.project.create({
       data: {
         name: 'Project with collections',
@@ -41,9 +36,7 @@ describe('Collection reading', () => {
     const totalCollectionsCount = await server.database.collection.count();
 
     // Ensure that there are more collections in database...
-    expect(totalCollectionsCount).toBeGreaterThan(
-      projectWithCollections.collections.length,
-    );
+    expect(totalCollectionsCount).toBeGreaterThan(projectWithCollections.collections.length);
     // ...but we get only the collections of given one project in response
     expect(parsedBody).toEqual(projectWithCollections.collections);
   });
@@ -77,10 +70,7 @@ describe('Collection reading', () => {
 describe('Collection creation', () => {
   test.todo('Cannot create collection with invalid payload');
 
-  test('Cannot create collection with the same name in one project', async ({
-    server,
-    oneProject,
-  }) => {
+  test('Cannot create collection with the same name in one project', async ({ server, oneProject }) => {
     // Create collection with COLLECTION_NAME directly in database
     await server.database.collection.create({
       data: { name: COLLECTION_NAME, projectId: oneProject.id },
@@ -118,10 +108,7 @@ describe('Collection creation', () => {
     });
   });
 
-  test('Can create collections with the same name in different projects', async ({
-    server,
-    manyProjects,
-  }) => {
+  test('Can create collections with the same name in different projects', async ({ server, manyProjects }) => {
     const response = await server.inject({
       url: '/collection',
       method: 'POST',
@@ -155,10 +142,7 @@ describe('Collection creation', () => {
       required: ['name', 'age', 'email'],
     };
 
-    test('Collection has correct schema property', async ({
-      collectionFactory,
-      oneProject,
-    }) => {
+    test('Collection has correct schema property', async ({ collectionFactory, oneProject }) => {
       const collectionWithoutSchema = await collectionFactory.createCollection({
         name: 'Collection without schema',
         project: { connect: { id: oneProject.id } },
@@ -174,10 +158,7 @@ describe('Collection creation', () => {
       expect(collectionWithSchema.schema).toEqual(JSON_SCHEMA);
     });
 
-    test('Can create/update schema of collection', async ({
-      server,
-      collectionFactory,
-    }) => {
+    test('Can create/update schema of collection', async ({ server, collectionFactory }) => {
       const collection = await collectionFactory.createCollection();
 
       expect(collection.schema).toBe(null);

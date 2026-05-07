@@ -1,12 +1,7 @@
-import { type FastifyPluginAsync } from 'fastify';
+import type { FastifyPluginAsync } from 'fastify';
 import qs from 'qs';
 
-import {
-  resourceReadSchema,
-  resourceListReadSchema,
-  resourceCreateSchema,
-  resourceUpdateSchema,
-} from './schema.js';
+import { resourceReadSchema, resourceListReadSchema, resourceCreateSchema, resourceUpdateSchema } from './schema.js';
 
 import type {
   ResourceReadSchema,
@@ -19,9 +14,7 @@ import type {
 import { isValidResourceWhereInput } from './utils.js';
 import { INVALID_WHERE_PARAMETER_MESSAGE } from './const.js';
 
-export const resourceController: FastifyPluginAsync<
-  ResourceControllerOptions
-> = async (fastify, options) => {
+export const resourceController: FastifyPluginAsync<ResourceControllerOptions> = async (fastify, options) => {
   const resourceService = options.resourceService;
 
   fastify.route<ResourceListReadSchema>({
@@ -83,10 +76,9 @@ export const resourceController: FastifyPluginAsync<
     url: '/resource/:id',
     schema: resourceUpdateSchema,
     handler: async (request, reply) => {
-      const updatedResource = await resourceService.updateResource(
-        request.params.id,
-        { payload: request.body.payload },
-      );
+      const updatedResource = await resourceService.updateResource(request.params.id, {
+        payload: request.body.payload,
+      });
 
       return reply.code(200).send(updatedResource);
     },

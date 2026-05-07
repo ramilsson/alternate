@@ -1,6 +1,6 @@
 import mime from 'mime';
-import { Client as MinioClient } from 'minio';
-import { Object } from './types.js';
+import type { Client as MinioClient } from 'minio';
+import type { Object } from './types.js';
 
 export async function getPresignedPostPolicy(
   object: Object & { name: string },

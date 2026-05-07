@@ -1,13 +1,11 @@
 import { describe, expect } from 'vitest';
-import { Resource } from '@prisma/client';
+import type { Resource } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 import { test } from '../tests';
 import { serializeResource } from '../tests/utils';
 
 describe('Resource reading', () => {
-  test('Cannot read list of resources with no collection id', async ({
-    server,
-  }) => {
+  test('Cannot read list of resources with no collection id', async ({ server }) => {
     const response = await server.inject({
       url: '/resource',
       method: 'GET',
@@ -16,22 +14,14 @@ describe('Resource reading', () => {
     expect(response.statusCode).toBe(400);
   });
 
-  test('Can read list of resources of single collection only', async ({
-    server,
-    oneProject,
-  }) => {
+  test('Can read list of resources of single collection only', async ({ server, oneProject }) => {
     const collectionWithResources = await server.database.collection.create({
       data: {
         name: 'Collection with resources',
         projectId: oneProject.id,
         resources: {
           createMany: {
-            data: [
-              { payload: {} },
-              { payload: {} },
-              { payload: {} },
-              { payload: {} },
-            ],
+            data: [{ payload: {} }, { payload: {} }, { payload: {} }, { payload: {} }],
           },
         },
       },
@@ -48,11 +38,7 @@ describe('Resource reading', () => {
 
     expect(response.statusCode).toBe(200);
     expect(resources).toHaveLength(collectionWithResources.resources.length);
-    expect(
-      resources.every(
-        (resource) => resource.collectionId === collectionWithResources.id,
-      ),
-    ).toBe(true);
+    expect(resources.every((resource) => resource.collectionId === collectionWithResources.id)).toBe(true);
   });
 
   test('Resource have payload property', async ({ server, oneResource }) => {
@@ -72,10 +58,7 @@ describe('Resource reading', () => {
 });
 
 describe('Resource creating/updating', () => {
-  test('Can create resource with valid payload', async ({
-    server,
-    oneCollection,
-  }) => {
+  test('Can create resource with valid payload', async ({ server, oneCollection }) => {
     const payload: Resource['payload'] = { foo: 'bar' };
 
     const response = await server.inject({
@@ -95,10 +78,7 @@ describe('Resource creating/updating', () => {
     expect(parsedBody.payload).toEqual(payload);
   });
 
-  test('Can update payload of resource', async ({
-    server,
-    oneResource: resourceToUpdate,
-  }) => {
+  test('Can update payload of resource', async ({ server, oneResource: resourceToUpdate }) => {
     const newPayload: Resource['payload'] = {
       newProperty: 'newValue',
     };
@@ -149,10 +129,7 @@ describe('Resource creating/updating', () => {
     ];
 
     for (const [index, payload] of INVALID_VARIANTS_OF_PAYLOAD.entries()) {
-      test(`Cannot create resource with invalid payload: ${index}`, async ({
-        server,
-        oneCollection,
-      }) => {
+      test(`Cannot create resource with invalid payload: ${index}`, async ({ server, oneCollection }) => {
         const response = await server.inject({
           url: '/resource',
           method: 'POST',
@@ -170,10 +147,7 @@ describe('Resource creating/updating', () => {
     }
 
     for (const [index, payload] of INVALID_VARIANTS_OF_PAYLOAD.entries()) {
-      test(`Cannot update resource with invalid payload: ${index}`, async ({
-        server,
-        oneResource,
-      }) => {
+      test(`Cannot update resource with invalid payload: ${index}`, async ({ server, oneResource }) => {
         const response = await server.inject({
           url: `/resource/${oneResource.id}`,
           method: 'PATCH',
@@ -262,10 +236,7 @@ describe('Reading resources with other related resources in payload', async () =
   });
 });
 
-test('Resources should have correct createdAt/updatedAt fields', async ({
-  server,
-  oneResource,
-}) => {
+test('Resources should have correct createdAt/updatedAt fields', async ({ server, oneResource }) => {
   const response = await server.inject({
     url: `/resource`,
     method: 'GET',

@@ -1,7 +1,7 @@
-import { FastifyPluginAsync } from 'fastify';
+import type { FastifyPluginAsync } from 'fastify';
 import fastifyPlugin from 'fastify-plugin';
 import { Client as MinioClient } from 'minio';
-import { MinioOptions, Minio } from './types.js';
+import type { MinioOptions, Minio } from './types.js';
 
 const minio: FastifyPluginAsync<MinioOptions> = async (fastify, options) => {
   const client = new MinioClient({

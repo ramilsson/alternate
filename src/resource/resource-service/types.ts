@@ -1,12 +1,10 @@
-import {
+import type {
   Resource as DatabaseResource,
   ResourceWithObjects as DatabaseResourceWithObjects,
   ResourceWithOutgoingRelations as DatabaseResourceWithOutgoingRelations,
   ResourceFindManyAndPopulateParams,
 } from '../../database/types.js';
 import type { Object } from '../../storage/object-service/types.js';
-
-export interface ResourceServiceOptions {}
 
 interface ResourceReadParams {
   resourceId: Resource['id'];
@@ -21,10 +19,7 @@ interface ResourceListReadParams extends ResourceFindManyAndPopulateParams {
 }
 
 export interface ResourceTransformParams {
-  resource:
-    | DatabaseResource
-    | DatabaseResourceWithObjects
-    | DatabaseResourceWithOutgoingRelations;
+  resource: DatabaseResource | DatabaseResourceWithObjects | DatabaseResourceWithOutgoingRelations;
 }
 
 export interface ResourceService {
@@ -32,13 +27,8 @@ export interface ResourceService {
 
   readResource: (params: ResourceReadParams) => Promise<Resource>;
   readResourceList: (params: ResourceListReadParams) => Promise<Resource[]>;
-  createResource: (
-    data: Pick<Resource, 'collectionId' | 'payload'>,
-  ) => Promise<DatabaseResource>;
-  updateResource: (
-    resourceId: Resource['id'],
-    data: Pick<Resource, 'payload'>,
-  ) => Promise<DatabaseResource>;
+  createResource: (data: Pick<Resource, 'collectionId' | 'payload'>) => Promise<DatabaseResource>;
+  updateResource: (resourceId: Resource['id'], data: Pick<Resource, 'payload'>) => Promise<DatabaseResource>;
 }
 
 export interface Resource extends DatabaseResource {

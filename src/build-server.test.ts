@@ -12,11 +12,10 @@ describe('Build server', () => {
       },
     });
 
-    const allowCredentials =
-      response.headers['access-control-allow-credentials'];
+    const allowCredentials = response.headers['access-control-allow-credentials'];
     const allowedMethods = response.headers['access-control-allow-methods'];
 
-    expect(allowCredentials).toBe("true");
+    expect(allowCredentials).toBe('true');
 
     expect(allowedMethods).toContain('GET');
     expect(allowedMethods).toContain('HEAD');

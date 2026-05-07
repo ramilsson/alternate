@@ -1,4 +1,4 @@
-import { Options as AjvOptions, _ } from 'ajv';
+import type { Options as AjvOptions } from 'ajv';
 import { validate } from 'uuid';
 
 export const AJV_OPTIONS: AjvOptions = {

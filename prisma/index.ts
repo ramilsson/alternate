@@ -1,4 +1,4 @@
-import { JSONType, SchemaObject } from 'ajv';
+import type { JSONType, SchemaObject } from 'ajv';
 
 declare global {
   namespace PrismaJson {
@@ -13,5 +13,3 @@ declare global {
     };
   }
 }
-
-export {};

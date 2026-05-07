@@ -1,5 +1,5 @@
 export { Object, ObjectStatus } from '@prisma/client';
-import { Client as MinioClient } from 'minio';
+import type { Client as MinioClient } from 'minio';
 
 export interface MinioOptions {
   host: string;

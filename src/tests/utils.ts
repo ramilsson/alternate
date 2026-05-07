@@ -1,4 +1,4 @@
-import { Resource } from '@prisma/client';
+import type { Resource } from '@prisma/client';
 
 export function serializeResource(resource: Resource) {
   return {

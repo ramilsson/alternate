@@ -3,10 +3,7 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     setupFiles: ['src/tests/setup-files.ts'],
-    globalSetup: [
-      'src/tests/minio-global-setup.ts',
-      'src/tests/global-setup.ts',
-    ],
+    globalSetup: ['src/tests/minio-global-setup.ts', 'src/tests/global-setup.ts'],
     passWithNoTests: true,
 
     /**

@@ -22,9 +22,7 @@ export interface Fixtures {
      * @param data - Collection data, defaults to fixture data
      * @returns The created collection
      */
-    createCollection: (
-      data?: Prisma.CollectionCreateInput,
-    ) => Promise<Collection>;
+    createCollection: (data?: Prisma.CollectionCreateInput) => Promise<Collection>;
   };
 
   oneResource: Resource;
@@ -36,10 +34,7 @@ export interface Fixtures {
      * @param payload - Resource payload. Defaults to fixture payload
      * @returns The created resource
      */
-    createResource: (
-      collection: Collection,
-      payload?: Resource['payload'],
-    ) => Promise<Resource>;
+    createResource: (collection: Collection, payload?: Resource['payload']) => Promise<Resource>;
   };
 
   minioClient: MinioClient;

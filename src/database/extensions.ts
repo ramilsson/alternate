@@ -1,12 +1,9 @@
-import { Resource, Prisma } from '@prisma/client';
+import { Prisma, type Resource } from '@prisma/client';
 import { validate } from 'uuid';
-import { ResourceFindManyAndPopulateParams } from './types.js';
+import type { ResourceFindManyAndPopulateParams } from './types.js';
 
 export const resourceModelExtension = Prisma.defineExtension((client) => {
-  const getRelatedResourceIds = (
-    resources: Resource[],
-    payloadKeys: string[],
-  ) => {
+  const getRelatedResourceIds = (resources: Resource[], payloadKeys: string[]) => {
     const relatedResourceIds = resources.reduce((acc, resource) => {
       const payload = resource.payload;
 
@@ -25,9 +22,7 @@ export const resourceModelExtension = Prisma.defineExtension((client) => {
   return client.$extends({
     model: {
       resource: {
-        async findManyAndPopulate(
-          params: ResourceFindManyAndPopulateParams,
-        ): Promise<Resource[]> {
+        async findManyAndPopulate(params: ResourceFindManyAndPopulateParams): Promise<Resource[]> {
           const { collectionId, populate, where, include } = params;
 
           const resources = await client.resource.findMany({
@@ -35,7 +30,7 @@ export const resourceModelExtension = Prisma.defineExtension((client) => {
             include: include,
           });
 
-          if (!populate || !populate.length) return resources;
+          if (!populate?.length) return resources;
 
           const relatedResourceIds = getRelatedResourceIds(resources, populate);
 
@@ -47,9 +42,7 @@ export const resourceModelExtension = Prisma.defineExtension((client) => {
 
           return resources.map((resource) => {
             populate.forEach((key) => {
-              const relatedResource = relatedResources.find(
-                (r) => r.id === resource.payload[key],
-              );
+              const relatedResource = relatedResources.find((r) => r.id === resource.payload[key]);
 
               if (relatedResource) resource.payload[key] = relatedResource;
             });

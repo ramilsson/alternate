@@ -3,10 +3,7 @@ import { describe, expect } from 'vitest';
 import { test } from '../../tests/index.js';
 
 describe('Resource controller', () => {
-  test('Read one resource including its objects', async ({
-    server,
-    oneObject,
-  }) => {
+  test('Read one resource including its objects', async ({ server, oneObject }) => {
     const response = await server.inject({
       method: 'get',
       url: `/resource/${oneObject.resourceId}`,

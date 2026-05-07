@@ -1,10 +1,9 @@
-import { describe, expect } from 'vitest';
-import { Collection } from '@prisma/client';
-
-import resourceService from './resource-service.js';
-import { ResourceService } from './types.js';
-import { test as testBase } from '../../tests/index.js';
 import { faker } from '@faker-js/faker';
+import type { Collection } from '@prisma/client';
+import { describe, expect } from 'vitest';
+import { test as testBase } from '../../tests/index.js';
+import resourceService from './resource-service.js';
+import type { ResourceService } from './types.js';
 
 interface Fixtures {
   resourceService: ResourceService;
@@ -28,11 +27,7 @@ const test = testBase.extend<Fixtures>({
 });
 
 describe('Resource service', () => {
-  test('Read one resource by id', async ({
-    resourceService,
-    resourceFactory,
-    oneCollection,
-  }) => {
+  test('Read one resource by id', async ({ resourceService, resourceFactory, oneCollection }) => {
     const newResource = await resourceFactory.createResource(oneCollection);
 
     const resource = await resourceService.readResource({
@@ -68,10 +63,7 @@ describe('Resource service', () => {
     });
   });
 
-  test('Read one resource including its objects', async ({
-    resourceService,
-    oneObject,
-  }) => {
+  test('Read one resource including its objects', async ({ resourceService, oneObject }) => {
     const resource = await resourceService.readResource({
       resourceId: oneObject.resourceId,
       include: { objects: true },
@@ -86,12 +78,12 @@ describe('Resource service', () => {
 
   test('Read resource list including their objects', async ({
     resourceService,
-    objectFactory,
     resourceFactory,
     oneCollection,
+    objectFactory,
   }) => {
     const newResource = await resourceFactory.createResource(oneCollection);
-    const newObject = await objectFactory.createObject(newResource);
+    await objectFactory.createObject(newResource);
 
     const resources = await resourceService.readResourceList({
       collectionId: newResource.collectionId,
@@ -111,11 +103,7 @@ describe('Resource service', () => {
   });
 
   describe('Resource validation against schema', () => {
-    test('Resource validation against schema', async ({
-      collectionFactory,
-      oneProject,
-      resourceService,
-    }) => {
+    test('Resource validation against schema', async ({ collectionFactory, oneProject, resourceService }) => {
       const JSON_SCHEMA = {
         $schema: 'http://json-schema.org/draft-07/schema#',
         type: 'object',
@@ -227,65 +215,53 @@ describe('Resource service', () => {
       },
     );
 
-    relationsTest(
-      'Update resource relation',
-      async ({ resourceService, authorsCollection, booksCollection }) => {
-        // Create initial author and book with relation
-        const authorResource = await resourceService.createResource({
-          collectionId: authorsCollection.id,
-          payload: {
-            name: 'Test author',
-            email: 'test@example.com',
-            department: 'Test departament',
-          },
-        });
-        const bookResource = await resourceService.createResource({
-          collectionId: booksCollection.id,
-          payload: {
-            title: 'Test title',
-            description: 'Test description',
-            author: authorResource.id,
-          },
-        });
+    relationsTest('Update resource relation', async ({ resourceService, authorsCollection, booksCollection }) => {
+      // Create initial author and book with relation
+      const authorResource = await resourceService.createResource({
+        collectionId: authorsCollection.id,
+        payload: {
+          name: 'Test author',
+          email: 'test@example.com',
+          department: 'Test departament',
+        },
+      });
+      const bookResource = await resourceService.createResource({
+        collectionId: booksCollection.id,
+        payload: {
+          title: 'Test title',
+          description: 'Test description',
+          author: authorResource.id,
+        },
+      });
 
-        // Create a second author to change the relationship to
-        const newAuthorResource = await resourceService.createResource({
-          collectionId: authorsCollection.id,
-          payload: {
-            name: 'New author',
-            email: 'new-author@example.com',
-            department: 'Test department',
-          },
-        });
+      // Create a second author to change the relationship to
+      const newAuthorResource = await resourceService.createResource({
+        collectionId: authorsCollection.id,
+        payload: {
+          name: 'New author',
+          email: 'new-author@example.com',
+          department: 'Test department',
+        },
+      });
 
-        // Update the book resource to reference the new author instead
-        await resourceService.updateResource(bookResource.id, {
-          payload: { ...bookResource.payload, author: newAuthorResource.id },
-        });
+      // Update the book resource to reference the new author instead
+      await resourceService.updateResource(bookResource.id, {
+        payload: { ...bookResource.payload, author: newAuthorResource.id },
+      });
 
-        // Read the updated resource and verify the relation has changed
-        const updatedResource = await resourceService.readResource({
-          resourceId: bookResource.id,
-          relations: ['author'],
-        });
+      // Read the updated resource and verify the relation has changed
+      const updatedResource = await resourceService.readResource({
+        resourceId: bookResource.id,
+        relations: ['author'],
+      });
 
-        expect(updatedResource.payload.author).toEqual(newAuthorResource.id);
-        expect(updatedResource.relations?.author).toMatchObject(
-          newAuthorResource,
-        );
-      },
-    );
+      expect(updatedResource.payload.author).toEqual(newAuthorResource.id);
+      expect(updatedResource.relations?.author).toMatchObject(newAuthorResource);
+    });
 
     relationsTest(
       'Update resource with new relation',
-      async ({
-        resourceService,
-        authorsCollection,
-        booksCollection,
-        resourceFactory,
-        collectionFactory,
-        server,
-      }) => {
+      async ({ resourceService, authorsCollection, booksCollection, resourceFactory, collectionFactory, server }) => {
         // Create initial author and book with relation
         const authorResource = await resourceService.createResource({
           collectionId: authorsCollection.id,
@@ -305,12 +281,10 @@ describe('Resource service', () => {
         });
 
         // Create a new resource (translation) in a separate collection
-        const translationsCollection =
-          await collectionFactory.createCollection();
-        const translationResource = await resourceFactory.createResource(
-          translationsCollection,
-          { ru: { title: 'Книга' } },
-        );
+        const translationsCollection = await collectionFactory.createCollection();
+        const translationResource = await resourceFactory.createResource(translationsCollection, {
+          ru: { title: 'Книга' },
+        });
 
         // Update the Books collection schema to add a new relation field
         await server.database.collection.update({
@@ -343,9 +317,7 @@ describe('Resource service', () => {
 
         // Verify the new relation was added and populated correctly
         expect(updatedResource.relations).toHaveProperty('translation');
-        expect(updatedResource.relations?.translation).toMatchObject(
-          translationResource,
-        );
+        expect(updatedResource.relations?.translation).toMatchObject(translationResource);
       },
     );
   });
