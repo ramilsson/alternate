@@ -12,6 +12,7 @@ const authPlugin: FastifyPluginAsync = async (fastify) => {
     secret: process.env.BETTER_AUTH_SECRET,
     baseURL: process.env.BETTER_AUTH_URL,
     basePath: '/auth',
+    advanced: { useSecureCookies: process.env.BETTER_AUTH_USE_SECURE_COOKIES === 'false' ? false : undefined },
   });
 
   fastify.route({
