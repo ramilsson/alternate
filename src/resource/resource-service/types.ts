@@ -5,6 +5,7 @@ import type {
   ResourceFindManyAndPopulateParams,
 } from '../../database/types.js';
 import type { Object } from '../../storage/object-service/types.js';
+import type { Extension } from './extensions/types.js';
 
 interface ResourceReadParams {
   resourceId: Resource['id'];
@@ -20,7 +21,11 @@ interface ResourceListReadParams extends ResourceFindManyAndPopulateParams {
 
 export interface ResourceTransformParams {
   resource: DatabaseResource | DatabaseResourceWithObjects | DatabaseResourceWithOutgoingRelations;
+  params: unknown;
+  extensions: Extension[] | null;
 }
+
+export interface ResourceRelationsTransformParams extends ResourceTransformParams {}
 
 export interface ResourceService {
   transformResource: (params: ResourceTransformParams) => Promise<Resource>;

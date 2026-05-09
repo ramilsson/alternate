@@ -3,30 +3,31 @@ import addFormats from 'ajv-formats';
 import type { FastifyPluginAsync } from 'fastify';
 import { fastifyPlugin } from 'fastify-plugin';
 import { validate as validateGuid } from 'uuid';
-import type {
-  Resource as DatabaseResource,
-  ResourceWithOutgoingRelations as DatabaseResourceWithOutgoingRelations,
-} from '../../database/types.js';
+import type { Resource as DatabaseResource } from '../../database/types.js';
 import { objectService } from '../../storage/object-service/index.js';
 
 import { AJV_OPTIONS } from './constants.js';
-import type { Resource, ResourceService } from './types.js';
+import { extensionsPlugin } from './extensions/index.js';
+import type { Resource, ResourceRelationsTransformParams, ResourceService } from './types.js';
 import { getResourceOutgoingRelationsArgs } from './utils/index.js';
 
 const resourceService: FastifyPluginAsync = async (fastify) => {
   fastify.register(objectService);
+  fastify.register(extensionsPlugin);
 
   const ajv = new Ajv(AJV_OPTIONS);
   addFormats.default(ajv);
 
-  const transformRelations = async (resource: DatabaseResource | DatabaseResourceWithOutgoingRelations) => {
+  const transformRelations = async (params: ResourceRelationsTransformParams) => {
+    const { resource } = params;
+
     if (!('outgoingRelations' in resource)) return undefined;
 
     const relationsObject: Resource['relations'] = {};
 
     for (const relation of resource.outgoingRelations) {
       relationsObject[relation.name] = relation.targetResource
-        ? await transformResource({ resource: relation.targetResource })
+        ? await transformResource({ ...params, resource: relation.targetResource })
         : null;
     }
 
@@ -34,7 +35,7 @@ const resourceService: FastifyPluginAsync = async (fastify) => {
   };
 
   const transformResource: ResourceService['transformResource'] = async (params) => {
-    const resource = params.resource;
+    const { resource, extensions } = params;
 
     const objects = await (async () => {
       if ('objects' in resource) {
@@ -44,11 +45,21 @@ const resourceService: FastifyPluginAsync = async (fastify) => {
       return undefined;
     })();
 
-    const relations = await transformRelations(resource);
-
+    const relations = await transformRelations(params);
     const outgoingRelations = undefined;
 
-    return { ...resource, objects, relations, outgoingRelations };
+    const payload = (() => {
+      if (!extensions?.length) return resource.payload;
+
+      const { payload } = extensions.reduce((acc, extension) => {
+        acc.payload = extension.transformPayload({ resource: acc, params: params.params, relations });
+        return acc;
+      }, resource);
+
+      return payload;
+    })();
+
+    return { ...resource, payload, objects, relations, outgoingRelations };
   };
 
   const readResource: ResourceService['readResource'] = async (params) => {
@@ -59,6 +70,9 @@ const resourceService: FastifyPluginAsync = async (fastify) => {
         outgoingRelations: params.relations ? getResourceOutgoingRelationsArgs(params.relations) : false,
       },
     });
+
+    const collection = await fastify.database.collection.findUniqueOrThrow({ where: { id: resource.collectionId } });
+    const extensions = fastify.extensions.getExtensions(collection);
 
     if (params.populate?.length) {
       const resourceIdsToPopulate = params.populate
@@ -81,7 +95,7 @@ const resourceService: FastifyPluginAsync = async (fastify) => {
       });
     }
 
-    return await transformResource({ resource });
+    return await transformResource({ resource, params, extensions });
   };
 
   const readResourceList: ResourceService['readResourceList'] = async (params) => {
@@ -95,7 +109,10 @@ const resourceService: FastifyPluginAsync = async (fastify) => {
       },
     });
 
-    return await Promise.all(resources.map((resource) => transformResource({ resource })));
+    const collection = await fastify.database.collection.findUniqueOrThrow({ where: { id: params.collectionId } });
+    const extensions = fastify.extensions.getExtensions(collection);
+
+    return await Promise.all(resources.map((resource) => transformResource({ resource, params, extensions })));
   };
 
   const createResource: ResourceService['createResource'] = async (data) => {
