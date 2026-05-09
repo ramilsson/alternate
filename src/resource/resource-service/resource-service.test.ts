@@ -385,6 +385,4 @@ describe('Resource service', () => {
       },
     );
   });
-
-  test.todo('Extensions');
 });

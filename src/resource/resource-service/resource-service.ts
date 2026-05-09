@@ -7,13 +7,11 @@ import type { Resource as DatabaseResource } from '../../database/types.js';
 import { objectService } from '../../storage/object-service/index.js';
 
 import { AJV_OPTIONS } from './constants.js';
-import { extensionsPlugin } from './extensions/index.js';
 import type { Resource, ResourceRelationsTransformParams, ResourceService } from './types.js';
 import { getResourceOutgoingRelationsArgs } from './utils/index.js';
 
 const resourceService: FastifyPluginAsync = async (fastify) => {
   fastify.register(objectService);
-  fastify.register(extensionsPlugin);
 
   const ajv = new Ajv(AJV_OPTIONS);
   addFormats.default(ajv);
@@ -35,7 +33,7 @@ const resourceService: FastifyPluginAsync = async (fastify) => {
   };
 
   const transformResource: ResourceService['transformResource'] = async (params) => {
-    const { resource, extensions } = params;
+    const { resource } = params;
 
     const objects = await (async () => {
       if ('objects' in resource) {
@@ -48,18 +46,7 @@ const resourceService: FastifyPluginAsync = async (fastify) => {
     const relations = await transformRelations(params);
     const outgoingRelations = undefined;
 
-    const payload = (() => {
-      if (!extensions?.length) return resource.payload;
-
-      const { payload } = extensions.reduce((acc, extension) => {
-        acc.payload = extension.transformPayload({ resource: acc, params: params.params, relations });
-        return acc;
-      }, resource);
-
-      return payload;
-    })();
-
-    return { ...resource, payload, objects, relations, outgoingRelations };
+    return { ...resource, objects, relations, outgoingRelations };
   };
 
   const readResource: ResourceService['readResource'] = async (params) => {
@@ -70,9 +57,6 @@ const resourceService: FastifyPluginAsync = async (fastify) => {
         outgoingRelations: params.relations ? getResourceOutgoingRelationsArgs(params.relations) : false,
       },
     });
-
-    const collection = await fastify.database.collection.findUniqueOrThrow({ where: { id: resource.collectionId } });
-    const extensions = fastify.extensions.getExtensions(collection);
 
     if (params.populate?.length) {
       const resourceIdsToPopulate = params.populate
@@ -95,7 +79,7 @@ const resourceService: FastifyPluginAsync = async (fastify) => {
       });
     }
 
-    return await transformResource({ resource, params, extensions });
+    return await transformResource({ resource });
   };
 
   const readResourceList: ResourceService['readResourceList'] = async (params) => {
@@ -109,10 +93,7 @@ const resourceService: FastifyPluginAsync = async (fastify) => {
       },
     });
 
-    const collection = await fastify.database.collection.findUniqueOrThrow({ where: { id: params.collectionId } });
-    const extensions = fastify.extensions.getExtensions(collection);
-
-    return await Promise.all(resources.map((resource) => transformResource({ resource, params, extensions })));
+    return await Promise.all(resources.map((resource) => transformResource({ resource })));
   };
 
   const createResource: ResourceService['createResource'] = async (data) => {

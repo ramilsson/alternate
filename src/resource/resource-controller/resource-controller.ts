@@ -1,6 +1,7 @@
 import type { FastifyPluginAsync } from 'fastify';
 import qs from 'qs';
 import { INVALID_WHERE_PARAMETER_MESSAGE } from './const.js';
+import { extensionsPlugin } from './extensions/index.js';
 import { resourceCreateSchema, resourceListReadSchema, resourceReadSchema, resourceUpdateSchema } from './schema.js';
 import type {
   ResourceControllerOptions,
@@ -14,10 +15,13 @@ import { isValidResourceWhereInput } from './utils.js';
 export const resourceController: FastifyPluginAsync<ResourceControllerOptions> = async (fastify, options) => {
   const resourceService = options.resourceService;
 
+  await fastify.register(extensionsPlugin);
+
   fastify.route<ResourceListReadSchema>({
     method: 'GET',
     url: '/resource',
     schema: resourceListReadSchema,
+    preSerialization: fastify.extensions.preSerialization,
     handler: async (request, reply) => {
       const parsedQuery = qs.parse(request.query, { comma: true });
 
@@ -41,6 +45,7 @@ export const resourceController: FastifyPluginAsync<ResourceControllerOptions> =
     method: 'GET',
     url: '/resource/:id',
     schema: resourceReadSchema,
+    preSerialization: fastify.extensions.preSerialization,
     handler: async (request, reply) => {
       const resource = await resourceService.readResource({
         resourceId: request.params.id,

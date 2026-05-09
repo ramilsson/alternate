@@ -18,4 +18,6 @@ describe('Resource controller', () => {
     expect(objects).toBeTruthy();
     expect(object?.url).toBeTruthy();
   });
+
+  test.todo('Extensions');
 });
