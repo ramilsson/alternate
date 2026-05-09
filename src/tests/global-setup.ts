@@ -12,6 +12,8 @@ async function runMigrations() {
 export default async function setup() {
   console.info('Database setup...');
 
+  if (!process.env.DATABASE_IMAGE) throw Error('Environment variable "DATABASE_IMAGE" is not set');
+
   const container = await new PostgreSqlContainer(process.env.DATABASE_IMAGE)
     .withDatabase(String(process.env.DATABASE_NAME))
     .withUsername(String(process.env.DATABASE_USER))

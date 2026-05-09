@@ -42,7 +42,7 @@ const authPlugin: FastifyPluginAsync = async (fastify) => {
         });
         return reply.send(response.body ? await response.text() : null);
       } catch (error) {
-        fastify.log.error('Authentication Error:', error);
+        console.error('Authentication Error:', error);
         return reply.status(500).send({
           error: 'Internal authentication error',
           code: 'AUTH_FAILURE',
