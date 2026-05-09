@@ -18,5 +18,6 @@ export const AJV_OPTIONS: AjvOptions = {
       },
     },
     'x-meta',
+    'x-extensions',
   ],
 };
